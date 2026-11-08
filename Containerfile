@@ -32,7 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 && rm -
 WORKDIR /app
 COPY --from=web /src/node_modules ./node_modules
 COPY . .
-COPY --from=web /src/web/build ./web/build
 COPY --from=web /src/dist ./dist
 COPY contrib/entrypoint.sh /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
