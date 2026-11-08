@@ -16,12 +16,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 - Page, "Check a proof": pasting a file's hash did nothing visible and there was no button to start. There is now an "Explain" button (checking also runs on paste), a box for the proof as hex, and a line under the inputs that says what is missing or why a paste cannot be used (not hex, odd length, no .ots header, a hash where a proof belongs or the reverse). A bare hash is named by its length (64: SHA-256; 40: SHA-1 or RIPEMD-160) and offers "Stamp this hash", which opens Stamp with it filled in. Browser smoke test: 12 new checks.
 
 ### Changed
+- Page: the header now says what is original about the tool (one of two independent implementations of one spec, TypeScript and Python, byte-identical on every test proof; two explorers must agree for a green verdict). Browser smoke test: 2 checks (77 in all). Hero picture retaken.
+- README, `docs/BACKLOG.md`, `docs/GOING-ONLINE.md`: the claims that real calendars, real explorers and Podman were never used are replaced by what the 2026-11-08 run showed, including that browsers can read a calendar's 200 answer but not its "not confirmed yet" 404 (no CORS header).
 - Page redesign: paper and ink with rules instead of cards, the system serif for prose and the system monospace for hashes (still no web fonts), one accent kept for Bitcoin. The five steps sit on one spine, and step 3 now shows the chain at a glance: your digest, the digest each phase ends on (calendar's tree, Bitcoin transaction, block's merkle path) and the block it lands in. Light, dark, print and phone width.
 
 ### Added
+- README hero picture `docs/hero.png`: the page proving the real stamp in `vectors/real/` against two public explorers. `./podman.sh hero` retakes it (`tools/screenshot.mjs`; needs the network).
+- `vectors/real/`: a real stamp made on 2026-11-08 against the three public calendars, before and after alice added the Bitcoin path (block 975064, header time 2026-11-08 13:02 UTC), with `test/test_real_vector.py` and two more vectors in the conformance run.
 - Static page `dist/index.html` (single file, strict CSP, light/dark, print, copyable text report, JSON download, permalinks).
 - `python/verify_ots.py` (stdlib only, Python ≥ 3.9) and `python/ots_stamp.py` (stamp, upgrade, watch).
-- Spec, JSON schema, 21 imported + 24 handcrafted vectors, conformance test (511 cases, JSON/text/permalink).
+- Spec, JSON schema, 21 imported + 24 handcrafted vectors, conformance test (535 cases, JSON/text/permalink; 511 before the real vectors).
 - Stamp and upgrade in the page (`web/src/core/stamp.ts`, written from SPEC section 12 alone), diffed against `ots_stamp.py` over real HTTP. The independent writer found that SPEC 12.7 skipped the 44-byte nodes real calendar proofs hang pending attestations on; fixed.
 - REST API `python/ots_api.py` (verify, stamp, upgrade, permalinks; digests only, network off by default, allow-lists, optional token and CORS origin), OpenAPI 3.1 in `spec/openapi.json`, JS and Python clients in `clients/`, `api` container command, library bundle `dist/ots-explain-core.mjs`.
 - `vectors/upgrade/` (7 upgrade cases, replayed in both languages), `tools/wild_diff.py` (differential test on real-world proofs from GitHub), `docs/BACKLOG.md`; workflow actions pinned to commit SHAs.
