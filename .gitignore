@@ -6,3 +6,4 @@ web/build/
 *.bak
 test/browser/.*.ots
 vectors/wild/
+e2e/

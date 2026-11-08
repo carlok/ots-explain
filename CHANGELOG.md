@@ -13,3 +13,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 - `vectors/upgrade/` (7 upgrade cases, replayed in both languages), `tools/wild_diff.py` (differential test on real-world proofs from GitHub), `docs/BACKLOG.md`; workflow actions pinned to commit SHAs.
 - `podman.sh` and a `ci` image target: test, build, serve, api, cli, live checks and repo creation without installing anything on the host.
 - Containerfile (untested), cron and systemd examples, offline demo.
+- `tools/e2e_real.sh`: one real end-to-end run in Podman (tests, images, a real stamp of a dummy file, the pending check, live explorer and wild checks), logging under the git-ignored `e2e/`.
