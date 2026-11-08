@@ -37,6 +37,9 @@ def cases(port):
     hd = os.path.join(ROOT, "vectors", "handcrafted")
     for name in sorted(json.load(open(os.path.join(hd, "index.json")))):
         vecs.append(("hc-" + name, os.path.join(hd, name + ".ots"), None))
+    rd = os.path.join(ROOT, "vectors", "real")  # a real stamp made by tools/e2e_real.sh, before and after Bitcoin confirmed it
+    for kind in ("pending", "confirmed"):
+        vecs.append(("real-dummy-" + kind, os.path.join(rd, "dummy-2026-11-08." + kind + ".ots"), os.path.join(rd, "dummy-2026-11-08.bin")))
     for vid, proof, data in vecs:
         try: own = V.parse_proof(open(proof, "rb").read()).digest.hex()
         except V.OtsError: own = "00" * 32
