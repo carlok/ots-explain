@@ -17,7 +17,7 @@ RUN npm run build
 
 # Everything for development and CI in one image: node, python, Chromium (for the browser smoke test), the npm packages.
 # Used by ./podman.sh so that nothing is installed on the host.   podman build --target ci -t ots-explain-ci .
-FROM mcr.microsoft.com/playwright:v1.63.0-noble AS ci
+FROM mcr.microsoft.com/playwright:v1.64.1-noble AS ci
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip git ca-certificates \
  && pip install --no-cache-dir --break-system-packages coverage && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
