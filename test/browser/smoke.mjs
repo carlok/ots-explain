@@ -259,6 +259,11 @@ try {
   const pj = readFileSync(await dl4.path(), "utf8");
   const pyOn = spawnSync("python3", ["-I", join(root, "python/verify_ots.py"), V("hello-world", "data.bin"), up, "--esplora", cal.esplora, "--yes", "--json"], { encoding: "utf8" });
   check(pyOn.status === 0 && pyOn.stdout === pj, "the page's JSON for the stamped+upgraded proof equals python's, byte for byte", `exit ${pyOn.status}`);
+  { // the page says what is original about it, and it must stay true: two implementations, two explorers
+    const why = await p5.locator("#why-trust").innerText();
+    check(/two independent implementations/.test(why) && /TypeScript/.test(why) && /Python/.test(why), "the page says it is one of two independent implementations (TypeScript and Python)", why);
+    check(/Two explorers must agree/.test(why), "the page says two explorers must agree", why);
+  }
   await p5.close();
 
   // 12b. a real calendar hangs its pending attestation on a 44-byte node (88 hex digits), not a 32-byte one: the upgrade

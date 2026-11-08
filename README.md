@@ -1,6 +1,6 @@
 # ots-explain
 
-![The page proving a real timestamp: "Proved: this existed before Bitcoin block 975064", then the five steps](docs/hero.png)
+![The page proving a real timestamp ("Proved: this existed before Bitcoin block 975064"), under its statement that two independent implementations in two languages and two agreeing explorers stand behind the answer](docs/hero.png)
 
 *A real stamp from 2026-11-08, checked in the page against two public explorers (`./podman.sh hero` retakes this picture).*
 
@@ -8,7 +8,7 @@ Check, understand and create [OpenTimestamps](https://opentimestamps.org/) proof
 see **every hop** from your file to a Bitcoin block, or stamp a file and upgrade it later, with the file never leaving
 your machine. Two **independent implementations of one written spec** must print byte-identical reports:
 
-* `dist/index.html`: one static page (73 KB, no dependencies, works from `file://`, nothing uploaded).
+* `dist/index.html`: one static page (81 KB, no dependencies, works from `file://`, nothing uploaded).
 * `python/verify_ots.py`: one stdlib-only Python script (≥ 3.9) with the same five steps.
 
 The page does both halves: **check** a proof and **stamp** a file (hash it in the tab, ask the public calendars,
