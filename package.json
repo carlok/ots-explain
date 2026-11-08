@@ -16,7 +16,7 @@
     "coverage": "node --test --experimental-test-coverage 'test/js/*.test.mjs' && coverage run --rcfile=.coveragerc -m unittest discover -s test -p 'test_*.py' && coverage report --rcfile=.coveragerc"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.6.6",
     "esbuild": "^0.25.0",
     "playwright": "^1.63.0",
     "typescript": "^5.6.0"
