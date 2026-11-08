@@ -17,6 +17,8 @@ set -eu
 cd "$(dirname "$0")"
 C="${CONTAINER:-podman}"
 cmd="${1:-help}"; [ $# -gt 0 ] && shift
+# -it only when stdin is a terminal: without one (an agent's shell, cron, a pipe) `run -it` fails.
+TTY=""; [ -t 0 ] && TTY=1
 ci()      { $C build -q --target ci -t ots-explain-ci . >/dev/null; }
 runtime() { $C build -q --target runtime -t ots-explain . >/dev/null; }
 case "$cmd" in
@@ -26,7 +28,7 @@ case "$cmd" in
   serve)     runtime; $C run --rm -p 127.0.0.1:8080:8080 ots-explain serve ;;
   api)       runtime; [ -n "${OTS_API_TOKEN:-}" ] || { echo "set OTS_API_TOKEN first (the API refuses a container bind without a token)" >&2; exit 2; }
              $C run --rm -p 127.0.0.1:8787:8787 -e OTS_API_TOKEN ots-explain api "$@" ;;
-  cli)       runtime; $C run --rm -it -v "$PWD:/work:Z" -w /work ots-explain "$@" ;;
+  cli)       runtime; $C run --rm ${TTY:+-it} -v "$PWD:/work:Z" -w /work ots-explain "$@" ;;
   live-check) ci; $C run --rm ots-explain-ci python3 tools/live_check.py "$@" ;;
   record)    ci; mkdir -p vectors/explorer; $C run --rm -v "$PWD/vectors/explorer:/app/vectors/explorer:Z" ots-explain-ci python3 tools/record_explorer.py "$@" ;;
   wild)      ci; $C run --rm ots-explain-ci python3 tools/wild_diff.py "$@" ;;
