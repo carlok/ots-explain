@@ -384,7 +384,7 @@ function upgradePanel(r: Report): HTMLElement {
     const ok = new Set(allowed());
     const lines = pend.map((a) => {
       const u = a.uri!.replace(/\/+$/, ""), d = proof.tree.find((n) => n.id === a.node)!.digest;
-      return ok.has(u) && d.length === 64 ? `GET ${u}/timestamp/${d}` : `(not asked: ${u} is not a calendar this page knows)`;
+      return ok.has(u) && d.length > 0 ? `GET ${u}/timestamp/${d}` : `(not asked: ${u} is not a calendar this page knows)`;
     });
     plan.textContent = lines.join("\n");
     go.toggleAttribute("disabled", !lines.some((l) => l.startsWith("GET ")));
