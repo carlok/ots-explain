@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: "23 4 * * 1"
 permissions:
+  actions: read  # needed on private repositories
   contents: read
   security-events: write
 jobs:

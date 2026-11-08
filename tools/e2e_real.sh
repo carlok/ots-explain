@@ -4,7 +4,7 @@
 # the live explorer and wild-proof checks.
 #   sh tools/e2e_real.sh          writes only under ./e2e/ (git-ignored) and, through `build`, ./dist
 # Running it is the consent to use the network: the public OpenTimestamps calendars (stamp, upgrade),
-# blockstream.info and mempool.space (live-check) and GitHub (wild). Each command still lists its URLs first.
+# blockstream.info and mempool.space (live-check) and GitHub (wild, only if GH_TOKEN is set: its code search refuses anonymous calls). Each command still lists its URLs first.
 # Every step runs even if an earlier one failed; the summary at the end gives each exit status.
 set -u
 cd "$(dirname "$0")/.."
@@ -48,7 +48,8 @@ step() {
   step pending-json ./podman.sh cli verify "$DUMMY" "$DUMMY.ots" --json
   step upgrade-now  ./podman.sh cli upgrade "$DUMMY.ots"
   step live-check   ./podman.sh live-check --yes
-  step wild         ./podman.sh wild
+  if [ -n "${GH_TOKEN:-}" ]; then step wild ./podman.sh wild
+  else echo; echo "== wild: skipped (GitHub's code search needs a token; run  GH_TOKEN=... sh tools/e2e_real.sh  to include it)"; echo "wild skipped" >> "$SUMMARY"; fi
 
   echo; echo "== summary (exit statuses; pending/upgrade-now are expected to say 'not proven yet' for a few hours)"
   cat "$SUMMARY"

@@ -10,7 +10,7 @@
     "typecheck": "tsc -p .",
     "test": "node --test 'test/js/*.test.mjs'",
     "test:py": "python3 -m unittest discover -s test -p 'test_*.py'",
-    "test:conformance": "python3 -m unittest test.test_conformance test.test_conformance_stamp -v",
+    "test:conformance": "python3 -m unittest discover -s test -p 'test_conformance*.py' -v",
     "test:browser": "node test/browser/smoke.mjs",
     "test:all": "npm run typecheck && npm run build && npm test && npm run test:py && npm run test:browser",
     "coverage": "node --test --experimental-test-coverage 'test/js/*.test.mjs' && coverage run --rcfile=.coveragerc -m unittest discover -s test -p 'test_*.py' && coverage report --rcfile=.coveragerc"

@@ -1,10 +1,14 @@
 # ots-explain
 
+![The page proving a real timestamp ("Proved: this existed before Bitcoin block 975064"), under its statement that two independent implementations in two languages and two agreeing explorers stand behind the answer](docs/hero.png)
+
+*A real stamp from 2026-11-08, checked in the page against two public explorers (`./podman.sh hero` retakes this picture).*
+
 Check, understand and create [OpenTimestamps](https://opentimestamps.org/) proofs in one place: open a `.ots` proof and
 see **every hop** from your file to a Bitcoin block, or stamp a file and upgrade it later, with the file never leaving
 your machine. Two **independent implementations of one written spec** must print byte-identical reports:
 
-* `dist/index.html`: one static page (73 KB, no dependencies, works from `file://`, nothing uploaded).
+* `dist/index.html`: one static page (81 KB, no dependencies, works from `file://`, nothing uploaded).
 * `python/verify_ots.py`: one stdlib-only Python script (≥ 3.9) with the same five steps.
 
 The page does both halves: **check** a proof and **stamp** a file (hash it in the tab, ask the public calendars,
@@ -42,8 +46,10 @@ Exit codes: `0` proved, `1` a check failed, `3` something was not checked (so: n
 `SHA-256(file hash ‖ 16 random bytes)`; the random bytes go only into your `.ots`. Download the pending proof,
 come back in a few hours, open it under "Check a proof", press "Ask the calendar" (only calendars the page knows, or
 one you add, are asked), download the upgraded `.ots`, and check the ledger. A browser can only read a calendar's
-answer if the calendar sends CORS headers; this is unverified for the real calendars (see Known limits), and the
-script has no such limit.
+answer if the calendar sends CORS headers. Checked against the real calendars on 2026-11-08: the answer that carries the
+Bitcoin path (HTTP 200) is readable from the page, but the "not confirmed yet" answer (HTTP 404) has no CORS header, so
+while a proof is still pending the page shows "unreachable: Failed to fetch" instead of "not yet". That is the browser
+refusing to show the answer, not a failed request. The script has no such limit.
 
 ### Stamping and the cron check (script, run by you)
 
@@ -58,9 +64,9 @@ Only `SHA-256(your digest ‖ 16 random bytes)` is sent to a calendar, never the
 
 ### Everything in Podman (nothing installed on the host)
 
-`./podman.sh` is the only entry point; the host needs Podman (or `CONTAINER=docker`) and this folder. Not run by the
-author (no Podman in the sandbox); a clean copy of the tree was run with `npm ci` and `npm run test:all` instead,
-which is what the `ci` image does (see "Known limits").
+`./podman.sh` is the only entry point; the host needs Podman (or `CONTAINER=docker`) and this folder. It was run for real
+on 2026-11-08 with Podman 5.8 on macOS (`tools/e2e_real.sh`): the `ci`, `test` and `runtime` images build, and the tests
+pass inside them. That run found a number of bugs, all fixed (see `CHANGELOG.md`).
 
 ```sh
 ./podman.sh test                  # typecheck, build, all tests, conformance, fuzz, browser smoke (Chromium inside)
@@ -165,7 +171,7 @@ Checked: `otskit` 0.1.0's PyPI page (stdlib-only, opt-in `--esplora`, checks pro
 | checks the transaction is in the block, the raw tx matches the proof, an output carries the commitment | yes (via Esplora) | not documented | not re-checked |
 | two servers must agree | yes | "several servers = several opinions" | not re-checked |
 | runs in a browser, offline, no upload | yes | n/a | the web page: not re-checked |
-| second, independent implementation diffed on every vector | yes (511 cases, 0 diffs; stamp/upgrade bytes and logs diffed too) | no | no |
+| second, independent implementation diffed on every vector | yes (535 cases, 0 diffs; stamp/upgrade bytes and logs diffed too) | no | no |
 | SPV (header chain, difficulty) | **no** | no | needs your own node for full independence |
 
 What this adds is **explanation, stamping and verifying in one open tool that sends nothing but a commitment or an explorer query, plus cross-checking**; it is not a stronger trust model. Hosted tools exist for single jobs (verify, or stamp); I found none that shows each hop, runs offline and is open source, but that is a few searches, not a survey.
@@ -177,10 +183,9 @@ See `docs/THREAT-MODEL.md`. In one line: *these bytes existed by that block, if 
 ## Known limits
 
 * **Not SPV.** A server that lies consistently, or two that collude, would pass. Proof of work is checked against the header's own `nBits`, not against the real chain's difficulty. For independence, compare the block hash with your own node.
-* The explorer data in `vectors/explorer/synthetic*` is **synthetic** (built around each proof so the code paths run). The author's sandbox could not reach real explorers. Run `python3 tools/record_explorer.py --yes` once on a networked machine to record real responses.
-* The block/tx page URLs shown under "Look for yourself" and the Esplora response formats follow the documented API but were not tested against the live sites.
-* Real calendars were never contacted; stamping and upgrading (page and script) were tested against a mock calendar only. Whether the real calendars allow a browser to read their answers (CORS) is unverified.
-* The Containerfile was never built (no Podman in the sandbox).
+* The explorer data in `vectors/explorer/synthetic*` is **synthetic** (built around each proof so the code paths run); the unit and conformance tests use it. Real explorers were asked once, on 2026-11-08 (`podman.sh live-check --yes`): blockstream.info and mempool.space agreed with the expected verdict on all seven official vectors asked (six PASS, one expected FAIL), and on the real proof listed next. Real recordings under `vectors/explorer/recorded-*` have not been made (`tools/record_explorer.py --yes`).
+* Real calendars were contacted on 2026-11-08: alice, bob and finney accepted a stamp from the script and from the page; the block that holds it is 975064 (header time 13:02 UTC, 22 minutes after the stamp); alice's answer was first seen at a poll 77 minutes after the stamp (the poll before, at 2 minutes, got "not yet"), and bob and finney still said "not yet" at that poll. The upgrade was done by the script and, separately, by the page's "Ask the calendar"; both proofs verify against both explorers. `vectors/real/` holds that file and its proof before and after. One proof, one day, three calendars: it shows the path works, not how long calendars usually take.
+* The browser cannot read a calendar's "not confirmed yet" answer (no CORS header on the 404, see above), so a pending proof shows "unreachable" on the page, not "not yet".
 * Only Bitcoin attestations are checked; Litecoin, Ethereum and unknown ones are shown and marked "not checked". `ripemd160`-headed proofs need `--digest`/pasted hash (files are hashed with SHA-256/SHA-1).
 * The page's UI code is covered by a browser smoke test, not by line coverage.
 
@@ -190,7 +195,7 @@ See `docs/BACKLOG.md` for what is not done, ranked.
 
 ```
 spec/      SPEC.md (normative), report.schema.json, steps.json, openapi.json, QUESTIONS-ts.md, QUESTIONS-stamp.md (where the spec was ambiguous)
-vectors/   21 imported proofs (+ reference.tree.json from python-opentimestamps), 24 handcrafted, synthetic explorer data
+vectors/   21 imported proofs (+ reference.tree.json from python-opentimestamps), 24 handcrafted, 1 real stamp (pending and confirmed), synthetic explorer data
 python/    verify_ots.py, ots_stamp.py, ots_api.py   clients/ js and python API clients   web/  src/core (TS core), src/ui (page), build.mjs
 test/      unit tests (Python, node), conformance, headless-browser smoke test, mock explorer and calendar
 ```

@@ -1,6 +1,6 @@
 # Going online: what only you can check
 
-The author built this in a sandbox with no route to real explorers, real calendars or Podman. These five steps turn
+Status, 2026-11-08: steps 1, 3, 4 and 5 were done on a Mac with Podman (see `docs/BACKLOG.md` and the README's Known limits); step 2 (recording explorer responses) is still open. The author first built this in a sandbox with no route to real explorers, real calendars or Podman. These five steps turn
 "tested against synthetic and mock data" into "tested against the real world". Do them in this order, on a machine with a
 network (everything can run through `./podman.sh`, so nothing is installed on the host), before making the repository public or announcing the page.
 
