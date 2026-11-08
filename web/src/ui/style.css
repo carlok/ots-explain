@@ -44,7 +44,11 @@ h1{font-size:clamp(1.55rem,4.2vw,2.2rem);line-height:1.15;margin:0 0 12px;letter
 .card .ok{color:var(--pass)}.card .no{color:var(--fail)}
 .or{grid-column:1/-1;display:grid;gap:6px}
 .or label{color:var(--muted);font-size:.92em}
-input[type=text],input[type=url]{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.slot{display:grid;gap:6px;align-content:start;min-width:0}.paste{color:var(--muted);font-size:.92em;margin-top:4px}
+.go{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.input-msg{margin:0;flex:1 1 300px;color:var(--muted)}.input-msg.bad{color:var(--fail)}
+textarea,input[type=text],input[type=url]{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+textarea{resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em}
 body.dragging::after{content:"Drop the file and its .ots proof here";position:fixed;inset:12px;border:3px dashed var(--accent);border-radius:20px;background:color-mix(in srgb,var(--bg) 82%,transparent);display:grid;place-items:center;font-size:1.3rem;font-weight:600;z-index:20;pointer-events:none}
 .note-card{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:10px 0}
 .note-card p{margin:0;flex:1 1 280px;word-break:break-all}

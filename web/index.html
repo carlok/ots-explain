@@ -33,21 +33,30 @@
 
   <div id="view-check" role="tabpanel" aria-labelledby="tab-check">
   <section id="inputs" class="inputs" aria-label="Inputs">
-    <label class="drop" id="drop-file">
-      <input type="file" id="file">
-      <span class="dt">1 · The file</span>
-      <span class="dh">Choose or drop the file that was timestamped</span>
-      <span class="chosen" id="file-name"></span>
-    </label>
-    <label class="drop" id="drop-proof">
-      <input type="file" id="proof" accept=".ots">
-      <span class="dt">2 · The proof</span>
-      <span class="dh">Choose or drop its <code>.ots</code> file</span>
-      <span class="chosen" id="proof-name"></span>
-    </label>
-    <div class="or">
-      <label for="digest">No file at hand? Paste its hash (hex) instead</label>
-      <input type="text" id="digest" placeholder="e.g. 945ad1a0…877f" spellcheck="false" autocomplete="off" inputmode="text">
+    <div class="slot">
+      <label class="drop" id="drop-file">
+        <input type="file" id="file">
+        <span class="dt">The file</span>
+        <span class="dh">Choose or drop the file that was timestamped.</span>
+        <span class="chosen" id="file-name"></span>
+      </label>
+      <label class="paste" for="digest">or paste its hash</label>
+      <input type="text" id="digest" placeholder="64 hex characters (SHA-256)" spellcheck="false" autocomplete="off" aria-describedby="input-msg">
+    </div>
+    <div class="slot">
+      <label class="drop" id="drop-proof">
+        <input type="file" id="proof" accept=".ots">
+        <span class="dt">The proof</span>
+        <span class="dh">Choose or drop its <code>.ots</code> file.</span>
+        <span class="chosen" id="proof-name"></span>
+      </label>
+      <label class="paste" for="proofhex">or paste the proof as hex</label>
+      <textarea id="proofhex" rows="2" placeholder="004f70656e54696d657374616d7073…" spellcheck="false" autocomplete="off" aria-describedby="input-msg"></textarea>
+    </div>
+    <div class="go">
+      <button type="button" class="primary" id="explain">Explain</button>
+      <p id="input-msg" class="input-msg" role="status">Drop a file and its <code>.ots</code> proof anywhere on this page, or paste the file's hash and the proof's hex.</p>
+      <button type="button" id="stamp-this" hidden>Stamp this hash</button>
     </div>
   </section>
 

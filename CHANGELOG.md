@@ -4,6 +4,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 
 ## [Unreleased]
 
+### Fixed
+- Page, "Check a proof": pasting a file's hash did nothing visible and there was no button to start. There is now an "Explain" button (checking also runs on paste), a box for the proof as hex, and a line under the inputs that says what is missing or why a paste cannot be used (not hex, odd length, no .ots header, a hash where a proof belongs or the reverse). A bare hash is named by its length (64: SHA-256; 40: SHA-1 or RIPEMD-160) and offers "Stamp this hash", which opens Stamp with it filled in. Browser smoke test: 12 new checks.
+
 ### Added
 - Static page `dist/index.html` (single file, strict CSP, light/dark, print, copyable text report, JSON download, permalinks).
 - `python/verify_ots.py` (stdlib only, Python ≥ 3.9) and `python/ots_stamp.py` (stamp, upgrade, watch).

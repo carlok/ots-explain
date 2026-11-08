@@ -3,7 +3,7 @@
 
 import {
   buildReport, canonicalJson, DEFAULT_SERVERS, decodePermalink, encodePermalink, fileFromBlob, fromHex, hex, isHex,
-  DEFAULT_CALENDARS, KNOWN_CALENDARS, commitmentFor, stampDigest, upgradeProof, type CalendarCall,
+  DEFAULT_CALENDARS, KNOWN_CALENDARS, MAGIC, commitmentFor, stampDigest, upgradeProof, type CalendarCall,
   ledgerPlan, parseProof, type Report, type Server, type FetchText, type FileInput,
 } from "../core/index.js";
 import stepsSpec from "../../../spec/steps.json";
@@ -83,6 +83,67 @@ async function setProofFile(f: File): Promise<void> {
   proofBytes = new Uint8Array(await f.arrayBuffer());
   proofLabel = f.name;
   ledgerServers = null;
+  ($("proofhex") as HTMLTextAreaElement).value = ""; proofPasteError = null;
+}
+
+// ------------------------------------------------------------------ pasted text
+
+type Pasted =
+  | { kind: "empty" }
+  | { kind: "digest"; hex: string; algs: string }
+  | { kind: "proof"; bytes: Uint8Array }
+  | { kind: "bad"; why: string };
+
+const MAGIC_HEX = hex(MAGIC);
+const PASTED = "pasted proof";
+
+/** What a pasted string is: a file hash (told apart by its length), an .ots proof (by its header), or why it is neither. */
+function classify(text: string): Pasted {
+  const s = text.replace(/\s+/g, "").replace(/^0x/i, "").toLowerCase();
+  if (!s) return { kind: "empty" };
+  const bad = s.search(/[^0-9a-f]/);
+  if (bad >= 0) return { kind: "bad", why: `This is not hex: it contains "${s[bad]}". Hex uses only the digits 0-9 and the letters a-f.` };
+  if (s.length % 2) return { kind: "bad", why: `${s.length} hex characters is an odd number. Each byte is two characters, so one is missing or one is extra.` };
+  if (s.startsWith(MAGIC_HEX)) {
+    if (s.length / 2 > MAX_PROOF) return { kind: "bad", why: "This is far too big for an .ots proof." };
+    return { kind: "proof", bytes: fromHex(s)! }; // s is checked to be even-length hex above
+  }
+  if (s.length === 64) return { kind: "digest", hex: s, algs: "SHA-256" };
+  if (s.length === 40) return { kind: "digest", hex: s, algs: "SHA-1 or RIPEMD-160 (both are 40 hex characters; the proof says which)" };
+  if (MAGIC_HEX.startsWith(s)) return { kind: "bad", why: `This is the start of an .ots header and nothing after it: ${s.length / 2} of its ${MAGIC.length} bytes.` };
+  if (s.length > 64) return { kind: "bad", why: `This is not an .ots proof: every proof starts with the header ${MAGIC_HEX.slice(0, 32)}… (the bytes of "OpenTimestamps"), and this starts with ${s.slice(0, 16)}….` };
+  return { kind: "bad", why: `${s.length / 2} bytes is not the size of a file hash: SHA-256 is 32 bytes (64 hex characters), SHA-1 and RIPEMD-160 are 20 bytes (40).` };
+}
+
+let proofPasteError: string | null = null;
+let moveNote: string | null = null;
+let hintNodes: Node[] = [];
+
+function setPastedProof(bytes: Uint8Array): void {
+  proofBytes = bytes; proofLabel = PASTED; ledgerServers = null; proofPasteError = null;
+}
+
+/** The line under the inputs: what is missing, what was understood, or why a pasted string cannot be used. */
+function guide(): void {
+  const m = $("input-msg");
+  const stampBtn = $("stamp-this") as HTMLButtonElement;
+  const pasted = file ? ({ kind: "empty" } as Pasted) : classify(($("digest") as HTMLInputElement).value);
+  let text: string | null = null, bad = false, stampable: string | null = null;
+  if (proofPasteError) { text = "The proof: " + proofPasteError; bad = true; }
+  else if (pasted.kind === "bad") { text = "The hash: " + pasted.why; bad = true; }
+  else if (!proofBytes) {
+    if (pasted.kind === "digest") {
+      text = `That is a file's hash (${pasted.algs}). A hash alone cannot be checked: the timestamp is in the .ots proof made for it. Drop or paste that proof to check it against this hash, or stamp the hash now to start a new proof.`;
+      if (pasted.algs === "SHA-256") stampable = pasted.hex;
+    } else if (file) text = "Now the .ots proof for this file: drop it or paste its hex.";
+  } else if (pasted.kind === "digest") text = `Checking the proof against the pasted hash (${pasted.algs}).`;
+  else if (!file) text = "No file and no hash, so step 1 is skipped. Add the file or paste its hash to check that too.";
+  if (moveNote) { text = moveNote + (text ? " " + text : ""); moveNote = null; }
+  if (text === null) m.replaceChildren(...hintNodes.map((n) => n.cloneNode(true)));
+  else m.textContent = text;
+  m.classList.toggle("bad", bad);
+  stampBtn.hidden = !stampable;
+  stampBtn.dataset.hex = stampable ?? "";
 }
 
 function setFile(f: File | null): void {
@@ -157,9 +218,11 @@ function proofFileName(): string {
 
 async function run(): Promise<void> {
   const my = ++runId;
-  const digestText = ($("digest") as HTMLInputElement).value.trim().toLowerCase();
-  if (!proofBytes) {
-    report = null; render(); live("Pick an .ots proof to begin."); return;
+  guide();
+  const pasted = file ? ({ kind: "empty" } as Pasted) : classify(($("digest") as HTMLInputElement).value);
+  const digestText = pasted.kind === "digest" ? pasted.hex : "";
+  if (!proofBytes || pasted.kind === "bad") {
+    report = null; render(); live(proofBytes ? "The pasted hash cannot be used: see the note under the inputs." : "Pick an .ots proof to begin."); return;
   }
   $("busy").hidden = false;
   live("Reading the proof…");
@@ -456,7 +519,7 @@ function loadFromLink(): void {
     $("link-note").hidden = false;
   }
   showChosen();
-  if (proofBytes) schedule();
+  if (proofBytes) schedule(); else guide();
 }
 
 
@@ -506,6 +569,7 @@ function renderStamp(): void {
       h("fieldset", null, h("legend", null, "Ask these calendars"), ...boxes,
         h("label", { class: "custom" }, h("span", null, "Another calendar (optional)"), custom), err,
         h("p", { class: "note" }, "A browser can only read an answer from a calendar that allows it. If every one fails here, the command-line script does the same job without that limit.")),
+      h("p", { class: "msg", id: "s-privacy" }, "Nothing has been sent yet. The button sends the calendars you ticked only the 32-byte commitment below, made from this hash and a random number. The file never leaves this computer, and not even its hash is sent."),
       h("p", { class: "plabel" }, "The page will make exactly these requests:"), plan, go),
   );
   refresh();
@@ -595,10 +659,49 @@ function init(): void {
   });
   $("file").addEventListener("change", (e) => { const f = (e.target as HTMLInputElement).files?.[0] ?? null; setFile(f); showChosen(); schedule(); });
   $("proof").addEventListener("change", async (e) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) { await setProofFile(f); showChosen(); schedule(); } });
+  hintNodes = [...$("input-msg").childNodes].map((n) => n.cloneNode(true));
+  const digestField = $("digest") as HTMLInputElement, proofField = $("proofhex") as HTMLTextAreaElement;
   let t: number | undefined;
-  $("digest").addEventListener("input", () => {
-    file = null; ($("file") as HTMLInputElement).value = ""; ledgerServers = null; showChosen();
-    clearTimeout(t); t = window.setTimeout(schedule, 250);
+  const soon = () => { clearTimeout(t); t = window.setTimeout(schedule, 250); };
+  digestField.addEventListener("input", () => {
+    file = null; ($("file") as HTMLInputElement).value = ""; ledgerServers = null;
+    const p = classify(digestField.value);
+    if (p.kind === "proof") { // a proof pasted into the hash box: put it where it belongs
+      setPastedProof(p.bytes); proofField.value = digestField.value.trim(); digestField.value = "";
+      moveNote = "That was a proof, not a hash, so it went into the proof box.";
+    }
+    showChosen(); soon();
+  });
+  proofField.addEventListener("input", () => {
+    const p = classify(proofField.value);
+    proofPasteError = null;
+    if (p.kind === "proof") { setPastedProof(p.bytes); ($("proof") as HTMLInputElement).value = ""; }
+    else {
+      if (proofLabel === PASTED) { proofBytes = null; proofLabel = ""; ledgerServers = null; }
+      if (p.kind === "digest") { // a hash pasted into the proof box
+        proofField.value = ""; digestField.value = p.hex; file = null; ($("file") as HTMLInputElement).value = "";
+        moveNote = "That was a file's hash, not a proof, so it went into the hash box.";
+      } else if (p.kind === "bad") proofPasteError = p.why;
+    }
+    showChosen(); soon();
+  });
+  $("explain").addEventListener("click", () => { clearTimeout(t); schedule(); });
+  $("stamp-this").addEventListener("click", () => {
+    const hx = ($("stamp-this") as HTMLButtonElement).dataset.hex;
+    if (!hx) return;
+    setMode("stamp");
+    const sd = $("sdigest") as HTMLInputElement;
+    sd.value = hx; sd.dispatchEvent(new Event("input"));
+    document.getElementById("h-ask")?.focus();
+  });
+  document.addEventListener("paste", (e) => { // a paste anywhere outside a field goes to the box it belongs in
+    if (mode !== "check" || (e.target as HTMLElement | null)?.closest?.("input, textarea")) return;
+    const text = e.clipboardData?.getData("text") ?? "";
+    const p = classify(text);
+    if (p.kind === "empty") return;
+    e.preventDefault();
+    const field = p.kind === "proof" ? proofField : digestField;
+    field.value = text.trim(); field.dispatchEvent(new Event("input"));
   });
   for (const m of ["check", "stamp"] as const) {
     $("tab-" + m).addEventListener("click", () => setMode(m));

@@ -22,7 +22,7 @@ Both walk the same five steps and end in a verdict that is green **only** when e
 ```sh
 # the page: open it, or serve it
 npm install && npm run build        # writes dist/index.html
-open dist/index.html                # drop a file and its .ots on it
+open dist/index.html                # drop a file and its .ots on it, or paste the file's hash and the proof's hex
 
 # the script (no install, standard library only)
 python3 python/verify_ots.py report.pdf report.pdf.ots              # offline: steps 1-3

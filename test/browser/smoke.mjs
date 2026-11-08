@@ -125,6 +125,49 @@ try {
   check(await p3.$eval("#step-file_hash", (e) => e.classList.contains("PASS")), "?proof= + #h= gives step 1 PASS");
   await p3.close();
 
+  // 7b. pasting: a bare hash is recognised and explained, hash + proof hex is checked, a bad paste says why,
+  // a proof pasted as the hash moves to the proof box, and "Stamp this hash" opens Stamp with it filled in
+  const p7 = await ctx.newPage(); const rp = requests.length;
+  await p7.goto(page_url);
+  const h256 = JSON.parse(pageJson).input.digest;
+  const msg7 = () => p7.textContent("#input-msg");
+  await p7.fill("#digest", h256);
+  await p7.waitForFunction(() => /cannot be checked/.test(document.getElementById("input-msg").textContent));
+  check(/SHA-256/.test(await msg7()) && await p7.isVisible("#stamp-this"), "a bare SHA-256 is named as a hash and offers 'Stamp this hash'", await msg7());
+  check(!(await p7.isVisible("#result")), "a bare hash shows no report");
+  await p7.click("#explain");
+  check(/cannot be checked/.test(await msg7()), "Explain with only a hash says the proof is needed");
+  await p7.fill("#digest", h256.slice(0, 40));
+  await p7.waitForFunction(() => /SHA-1 or RIPEMD-160/.test(document.getElementById("input-msg").textContent));
+  check(!(await p7.isVisible("#stamp-this")), "a 40-character hash is named as SHA-1 or RIPEMD-160 and is not offered for stamping");
+  await p7.fill("#digest", h256);
+  const proofHex = readFileSync(V("hello-world", "proof.ots")).toString("hex");
+  await p7.fill("#proofhex", proofHex);
+  await p7.waitForFunction(() => document.querySelector("#step-file_hash")?.classList.contains("PASS"));
+  check(!(await p7.isVisible("#stamp-this")), "hash + pasted proof hex: step 1 passes, and 'Stamp this hash' is gone");
+  await p7.fill("#proofhex", "zz" + proofHex.slice(2));
+  await p7.waitForFunction(() => /not hex/.test(document.getElementById("input-msg").textContent));
+  check(!(await p7.isVisible("#result")), "a pasted proof that is not hex is explained and clears the report");
+  await p7.fill("#proofhex", proofHex.slice(0, -1));
+  await p7.waitForFunction(() => /odd number/.test(document.getElementById("input-msg").textContent));
+  await p7.fill("#proofhex", "00".repeat(80));
+  await p7.waitForFunction(() => /not an \.ots proof/.test(document.getElementById("input-msg").textContent));
+  check(await p7.$eval("#input-msg", (e) => e.classList.contains("bad")), "odd length and a missing .ots header are explained too");
+  await p7.fill("#proofhex", "");
+  await p7.fill("#digest", proofHex);
+  await p7.waitForSelector("#result .steps");
+  check(await p7.inputValue("#digest") === "" && (await p7.inputValue("#proofhex")).length > 100 && /went into the proof box/.test(await msg7()), "a proof pasted as the hash goes to the proof box", await msg7());
+  await p7.fill("#proofhex", ""); await p7.fill("#digest", h256);
+  await p7.waitForSelector("#stamp-this:visible");
+  await p7.click("#stamp-this");
+  await p7.waitForSelector("#send");
+  check(await p7.isVisible("#view-stamp") && await p7.inputValue("#sdigest") === h256, "'Stamp this hash' opens Stamp with the hash filled in");
+  check(/Nothing has been sent yet/.test(await p7.textContent("#s-privacy")), "Stamp says nothing was sent before the button");
+  const sp7 = await p7.textContent("#splan");
+  check(/body: [0-9a-f]{64}/.test(sp7) && !sp7.includes(h256), "the stamp plan sends a commitment, not the hash");
+  check(requests.length === rp, "pasting, Explain and 'Stamp this hash' make no request");
+  await p7.close();
+
   // 8. pasted digest, no file
   const p4 = await ctx.newPage();
   await p4.goto(page_url);

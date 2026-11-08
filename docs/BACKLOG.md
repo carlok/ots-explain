@@ -13,7 +13,7 @@ author's sandbox could do it, *you* = needs a networked machine or an account. U
 | 6 | Make the workflows **run once** (CI, Pages, release, CodeQL) | They parse as YAML but have never executed | 20 min after the repo exists | you | open (YAML validated) |
 | 7 | **Real-world proofs** as test data | Imported and handcrafted proofs were all written by test authors | easy | me | **done as far as it goes**: `tools/wild_diff.py` (2 raw files exist on GitHub; both parse, 0 divergences) and `vectors/upgrade/` (7 upgrade cases on the official 44-byte nodes, replayed in both languages). Better proofs: stamp your own (#3) and add them |
 | 8 | Repository settings: private vulnerability reporting, branch protection on `main`, Pages source | `gh` is not authenticated here | 5 min | you | open (`tools/create_github_repo.sh` does About/topics) |
-| 9 | Accept a **base64 or hex pasted proof** (two of the few real proofs on GitHub are stored as base64 text) | Real people paste what they have; today it is `bad_magic` | medium: spec section, both implementations, vectors | me | open, next |
+| 9 | Accept a **base64 or hex pasted proof** (two of the few real proofs on GitHub are stored as base64 text) | Real people paste what they have; today it is `bad_magic` | medium: spec section, both implementations, vectors | me | hex: done in the page (paste box, 2026-11-08); base64 and the Python script: open |
 | 10 | **SPV / your own node**: check the block hash against a Bitcoin Core RPC (`--bitcoin-rpc`) and the real difficulty | Removes "two explorers agree" as the trust root; the README says so | medium-hard | me + you | open |
 
 Not planned: verifying Litecoin or Ethereum attestations (calendars only anchor in Bitcoin; each chain needs its own
