@@ -10,7 +10,8 @@
 #   ./podman.sh cli ARGS...     verify_ots.py / ots_stamp.py in the current folder:  cli verify f f.ots | cli stamp f | cli upgrade f.ots
 #   ./podman.sh live-check [--yes]   list the real explorers it would ask; add --yes to ask them
 #   ./podman.sh record [--yes]   list, or with --yes record, real explorer answers into ./vectors/explorer/recorded-*
-#   ./podman.sh wild            diff both implementations on real-world proofs fetched from GitHub (nothing is saved on the host)
+#   ./podman.sh wild            diff both implementations on real-world proofs fetched from GitHub (needs GH_TOKEN in the environment:
+#                               GitHub's code search refuses anonymous calls; nothing is saved on the host)
 #   ./podman.sh repo [owner/name]   create the private GitHub repo (needs GH_TOKEN in the environment; writes ./.git)
 #   ./podman.sh clean           remove the images this script built
 set -eu
@@ -34,7 +35,7 @@ case "$cmd" in
   cli)       runtime; $C run --rm ${TTY:+-it} $WHO -v "$PWD:/work:Z" -w /work ots-explain "$@" ;;
   live-check) ci; $C run --rm ots-explain-ci python3 tools/live_check.py "$@" ;;
   record)    ci; mkdir -p vectors/explorer; $C run --rm -v "$PWD/vectors/explorer:/app/vectors/explorer:Z" ots-explain-ci python3 tools/record_explorer.py "$@" ;;
-  wild)      ci; $C run --rm ots-explain-ci python3 tools/wild_diff.py "$@" ;;
+  wild)      ci; $C run --rm -e GH_TOKEN ots-explain-ci python3 tools/wild_diff.py "$@" ;;
   repo)      [ -n "${GH_TOKEN:-}" ] || { echo "set GH_TOKEN (a GitHub token with repo scope) first" >&2; exit 2; }
              $C run --rm -e GH_TOKEN -v "$PWD:/src:Z" -w /src docker.io/library/alpine:3 sh -c 'apk add --no-cache -q git github-cli && git config --global user.name "${GIT_AUTHOR_NAME:-ots-explain}" && git config --global user.email "${GIT_AUTHOR_EMAIL:-noreply@example.invalid}" && git config --global --add safe.directory /src && sh tools/create_github_repo.sh "$@"' sh "$@" ;;
   clean)     $C rmi -f ots-explain-ci ots-explain 2>/dev/null || true ;;

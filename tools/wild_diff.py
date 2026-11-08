@@ -4,16 +4,17 @@
 
     python3 tools/wild_diff.py [--per-repo 5] [--max 60] [--dir vectors/wild] [--no-fetch]
 
-1. Finds `.ots` files on GitHub (public code-search API, unauthenticated, rate limited), keeps those that start with the
+1. Finds `.ots` files on GitHub (public code-search API; GitHub requires a token for it, any token with no scopes will do:
+   set GH_TOKEN. It is sent to api.github.com only, never to raw.githubusercontent.com), keeps those that start with the
    OpenTimestamps magic, at most --per-repo from each repository, and downloads them to --dir (git-ignored: these are
    other people's files with unknown licences, so they are NOT committed). A manifest with each file's source URL and
    SHA-256 is written next to them. Only the proof is downloaded, never the file it is about.
 2. Runs both implementations on each proof, with the digest taken from the proof (offline, ledger off), and diffs the
    canonical JSON, the text report and the text report with every hop.
 Prints one line of totals and every divergence. Exit 0 = no divergence. It talks to api.github.com and
-raw.githubusercontent.com only, and nothing but a search query and file paths is sent.
+raw.githubusercontent.com only, and nothing but a search query and file paths is sent (plus the token, to the former).
 """
-import argparse, base64, collections, hashlib, json, os, subprocess, sys, tempfile, time, urllib.parse, urllib.request
+import argparse, base64, collections, hashlib, json, os, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "python"))
@@ -24,10 +25,16 @@ UA = {"User-Agent": "ots-explain-wild-diff", "Accept": "application/vnd.github+j
 
 
 def get(url, tries=3):
+    headers = dict(UA)
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token and urllib.parse.urlparse(url).hostname == "api.github.com": headers["Authorization"] = "Bearer " + token
     for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r: return r.read()
-        except Exception as e:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as r: return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403, 404) or i == tries - 1: raise  # retrying will not change these
+            time.sleep(2 * (i + 1))
+        except Exception:
             if i == tries - 1: raise
             time.sleep(2 * (i + 1))
 
@@ -35,7 +42,12 @@ def get(url, tries=3):
 def search(per_repo, maximum):
     found = collections.defaultdict(list)
     for page in (1, 2, 3):
-        d = json.loads(get("https://api.github.com/search/code?q=extension:ots&per_page=100&page=%d" % page))
+        try: d = json.loads(get("https://api.github.com/search/code?q=extension:ots&per_page=100&page=%d" % page))
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                raise SystemExit("GitHub's code search refused the request (HTTP %d). It needs a token: set GH_TOKEN "
+                                 "(any token, no scopes needed), e.g.  GH_TOKEN=... ./podman.sh wild" % e.code)
+            raise
         for it in d["items"]: found[it["repository"]["full_name"]].append(it["path"])
         if len(d["items"]) < 100: break
     out = []
