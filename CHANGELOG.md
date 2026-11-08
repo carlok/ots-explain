@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 ## [Unreleased]
 
 ### Fixed
+- `codeql.yml`: the analysis ran but its report failed with "Resource not accessible by integration" in a private repository; the workflow now has `actions: read`.
 - CI, first run on GitHub: `docker build` looked for a `Dockerfile` (now `-f Containerfile`); the Python 3.9 job needs `ubuntu-24.04` because `ubuntu-latest` is 26.04, which has no 3.9; `test:conformance` and the extra fuzz step ran `unittest test.test_…`, which imports the standard library's own `test` package instead of this folder's (they now use `unittest discover`).
 - Page, "This proof is still pending": the upgrade plan refused every real calendar ("not a calendar this page knows") because it required a 64-digit node, while real calendars hang the pending attestation on a 44-byte node (88 digits). SPEC 12.7 has no length condition and Python never had one. Found by pasting a real, freshly stamped proof. Browser smoke test: 3 new checks on the `two-calendars` vector (75 in all).
 - `tools/e2e_real.sh`: the `wild` step runs only when `GH_TOKEN` is set and is reported as skipped otherwise, instead of failing with a 401.
