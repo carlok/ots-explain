@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ots-explain-report/1",
+  "title": "ots-explain report, version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["spec", "input", "error", "proof", "steps", "ledger", "verdict"],
+  "properties": {
+    "spec": {"const": "ots-explain-report/1"},
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "size", "digest", "digest_alg"],
+      "properties": {
+        "mode": {"enum": ["file", "digest", "none"]},
+        "size": {"type": ["integer", "null"], "minimum": 0},
+        "digest": {"type": ["string", "null"], "pattern": "^([0-9a-f]{2})+$"},
+        "digest_alg": {"enum": ["sha256", "sha1", "ripemd160", null]}
+      }
+    },
+    "error": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "object", "additionalProperties": false, "required": ["code"], "properties": {"code": {"type": "string"}}}
+      ]
+    },
+    "proof": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["size", "version", "hash_op", "digest", "nodes", "ops", "max_depth", "tree", "attestations"],
+          "properties": {
+            "size": {"type": "integer", "minimum": 1},
+            "version": {"const": 1},
+            "hash_op": {"enum": ["sha256", "sha1", "ripemd160"]},
+            "digest": {"type": "string", "pattern": "^([0-9a-f]{2})+$"},
+            "nodes": {"type": "integer", "minimum": 1},
+            "ops": {"type": "integer", "minimum": 0},
+            "max_depth": {"type": "integer", "minimum": 0},
+            "tree": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["id", "parent", "op", "arg", "digest"],
+                "properties": {
+                  "id": {"type": "integer", "minimum": 0},
+                  "parent": {"type": "integer", "minimum": -1},
+                  "op": {"enum": [null, "append", "prepend", "sha256", "sha1", "ripemd160", "keccak256", "reverse", "hexlify"]},
+                  "arg": {"type": ["string", "null"], "pattern": "^([0-9a-f]{2})+$"},
+                  "digest": {"type": "string", "pattern": "^([0-9a-f]{2})*$"}
+                }
+              }
+            },
+            "attestations": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["index", "node", "kind", "height", "uri", "tag", "payload", "phases", "where_to_look"],
+                "properties": {
+                  "index": {"type": "integer", "minimum": 0},
+                  "node": {"type": "integer", "minimum": 0},
+                  "kind": {"enum": ["bitcoin", "litecoin", "ethereum", "pending", "unknown"]},
+                  "height": {"type": ["integer", "null"], "minimum": 0},
+                  "uri": {"type": ["string", "null"]},
+                  "tag": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+                  "payload": {"type": "string", "pattern": "^([0-9a-f]{2})*$"},
+                  "phases": {
+                    "oneOf": [
+                      {"type": "null"},
+                      {
+                        "type": "object", "additionalProperties": false,
+                        "required": ["path", "commitment_index", "transaction_index", "txid_index", "root_index", "commitment", "txid", "output"],
+                        "properties": {
+                          "path": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+                          "commitment_index": {"type": "integer", "minimum": 0},
+                          "transaction_index": {"type": "integer", "minimum": 2},
+                          "txid_index": {"type": "integer", "minimum": 4},
+                          "root_index": {"type": "integer", "minimum": 4},
+                          "commitment": {"type": "string", "pattern": "^([0-9a-f]{2})+$"},
+                          "txid": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                          "output": {
+                            "oneOf": [
+                              {"type": "null"},
+                              {
+                                "type": "object", "additionalProperties": false,
+                                "required": ["index", "kind", "script"],
+                                "properties": {
+                                  "index": {"type": "integer", "minimum": 0},
+                                  "kind": {"enum": ["op_return", "p2sh", "p2pkh", "other"]},
+                                  "script": {"type": "string", "pattern": "^([0-9a-f]{2})*$"}
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "where_to_look": {
+                    "type": "array",
+                    "items": {
+                      "type": "object", "additionalProperties": false,
+                      "required": ["kind", "server", "url"],
+                      "properties": {
+                        "kind": {"enum": ["block", "tx", "raw_hex"]},
+                        "server": {"enum": ["blockstream.info", "mempool.space"]},
+                        "url": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "steps": {
+      "type": "array", "minItems": 5, "maxItems": 5,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "title", "status", "code"],
+        "properties": {
+          "id": {"enum": ["file_hash", "structure", "hash_steps", "ledger", "verdict"]},
+          "title": {"type": "string"},
+          "status": {"enum": ["PASS", "FAIL", "SKIP"]},
+          "code": {"type": "string"}
+        }
+      }
+    },
+    "ledger": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["servers", "plan", "attestations"],
+          "properties": {
+            "servers": {
+              "type": "array", "minItems": 1,
+              "items": {"type": "object", "additionalProperties": false, "required": ["name", "base"],
+                        "properties": {"name": {"type": "string"}, "base": {"type": "string"}}}
+            },
+            "plan": {
+              "type": "array",
+              "items": {"type": "object", "additionalProperties": false, "required": ["attestation", "server", "url"],
+                        "properties": {"attestation": {"type": "integer"}, "server": {"type": "string"}, "url": {"type": "string"}}}
+            },
+            "attestations": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["attestation", "agree", "servers"],
+                "properties": {
+                  "attestation": {"type": "integer"},
+                  "agree": {"type": ["boolean", "null"]},
+                  "servers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object", "additionalProperties": false,
+                      "required": ["server", "status", "block_hash", "header", "time", "checks"],
+                      "properties": {
+                        "server": {"type": "string"},
+                        "status": {"enum": ["PASS", "FAIL", "SKIP"]},
+                        "block_hash": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+                        "header": {"type": ["string", "null"], "pattern": "^[0-9a-f]{160}$"},
+                        "time": {"type": ["integer", "null"], "minimum": 0},
+                        "checks": {
+                          "type": "array",
+                          "items": {
+                            "type": "object", "additionalProperties": false,
+                            "required": ["id", "status", "code"],
+                            "properties": {
+                              "id": {"enum": ["block_hash", "header", "merkle_root", "txids", "raw_tx", "output"]},
+                              "status": {"enum": ["PASS", "FAIL", "SKIP"]},
+                              "code": {"type": "string"}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "verdict": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "code", "block", "time", "unverified"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "SKIP"]},
+        "code": {"enum": ["proved", "failed", "incomplete"]},
+        "block": {"type": ["integer", "null"], "minimum": 0},
+        "time": {"type": ["integer", "null"], "minimum": 0},
+        "unverified": {"type": "array", "items": {"type": "integer", "minimum": 0}}
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# systemd user unit: ask the calendars about pending proofs in one folder, and (optionally) check confirmed ones.
+# Install:  cp contrib/ots-watch.* ~/.config/systemd/user/ && systemctl --user enable --now ots-watch.timer
+# Edit the two paths first. Nothing here runs until you enable the timer.
+[Unit]
+Description=Upgrade pending OpenTimestamps proofs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/ots-explain/python/ots_stamp.py watch %h/proofs --ledger

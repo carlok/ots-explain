@@ -1,0 +1,7 @@
+ots-explain
+Copyright 2026 Carlo Perassi
+Licensed under the Apache License, Version 2.0.
+
+Test data: the imported vectors in vectors/ are example proofs and files copied unmodified from OpenTimestamps
+projects and remain under the GNU Lesser General Public License v3.0 (vectors/LICENSE-LGPL-3.0.txt; see
+vectors/PROVENANCE.md). They are test data, not part of the distributed page or scripts.

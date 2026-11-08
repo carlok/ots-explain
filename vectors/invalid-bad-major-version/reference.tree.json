@@ -1,0 +1,4 @@
+{
+ "valid": false,
+ "error": "UnsupportedMajorVersion: Version 255 detached timestamp files are not supported"
+}

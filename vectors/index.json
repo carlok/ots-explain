@@ -1,0 +1,342 @@
+{
+ "vectors": [
+  {
+   "id": "hello-world",
+   "note": "valid Bitcoin proof from 2015; first op is RIPEMD-160",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/hello-world.txt.ots",
+    "data": "examples/hello-world.txt"
+   },
+   "data_sha256": "03ba204e50d126e4674c005e04d82e84c21366780af1f43bd54a37816b6ab340",
+   "data_size": 13,
+   "proof_sha256": "be61ecb940db2e4a6f89fbed59c8d4f7f74fa756cbc1fad1ad7aabcb2bf59c30",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "bad-stamp",
+   "note": "meant to fail",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/bad-stamp.txt.ots",
+    "data": "examples/bad-stamp.txt"
+   },
+   "data_sha256": "7e3717bbe020f53cdc6c40154a1a8e55bddc13a28c8bb3c82e9ee64b81b44872",
+   "data_size": 93,
+   "proof_sha256": "ffea851e316c968e5142df3ea8aa668621d2fec30153e0bd0ef912782e2af7cc",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "empty",
+   "note": "zero-byte file",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/empty.ots",
+    "data": "examples/empty"
+   },
+   "data_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "data_size": 0,
+   "proof_sha256": "3bc98a0c89639e3e0b717701877a849bb8b38147402dfb19643cb3bd39894535",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "incomplete",
+   "note": "pending only",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/incomplete.txt.ots",
+    "data": "examples/incomplete.txt"
+   },
+   "data_sha256": "05c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9",
+   "data_size": 63,
+   "proof_sha256": "95673f2878cbcfdddded530bd2ad5f3fb04e13d2e659760d7c1386346fdd036c",
+   "shipped_info": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "path": "examples/incomplete.txt.ots.info"
+   },
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "merkle1",
+   "note": "merkle path",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/merkle1.txt.ots",
+    "data": "examples/merkle1.txt"
+   },
+   "data_sha256": "d32fee9a827f5a0d580f80beb7edce662dd99fcd6591e4ef8a6244403df0b7c9",
+   "data_size": 111,
+   "proof_sha256": "90ba8251d3f3c67e7a0f1610503912b522deeac4662267f8b38d7e81d697c300",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "merkle2",
+   "note": "merkle path",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/merkle2.txt.ots",
+    "data": "examples/merkle2.txt"
+   },
+   "data_sha256": "8bd5a5f07b4451c29756df5eb51d194fb5b20c7e89812d877bbad30d871c582f",
+   "data_size": 111,
+   "proof_sha256": "3603fe0d3de5cde8408c1ce2c79210c9428a4e30c24a79b702f99ff1702f02f5",
+   "shipped_info": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "path": "examples/merkle2.txt.ots.info"
+   },
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "merkle3",
+   "note": "merkle path",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/merkle3.txt.ots",
+    "data": "examples/merkle3.txt"
+   },
+   "data_sha256": "3966a69fc344107bb4f30c574305d9b4508df2cb8e65dd46007a2cfb116b9579",
+   "data_size": 111,
+   "proof_sha256": "ad1f4b14c09dc037afbbc3bea91c3e464df668b994c034bdf11d3eda5d3fc082",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "two-calendars",
+   "note": "two pending calendars",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/two-calendars.txt.ots",
+    "data": "examples/two-calendars.txt"
+   },
+   "data_sha256": "efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddb",
+   "data_size": 70,
+   "proof_sha256": "1f0fe002dc50f6bc96bcab1fffa9d22f8fa71ac1f99b91bd5ece04d06d8b4d64",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "known-and-unknown-notary",
+   "note": "one known and one unknown attestation",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/known-and-unknown-notary.txt.ots",
+    "data": "examples/known-and-unknown-notary.txt"
+   },
+   "data_sha256": "d288b2ee212b01e3e5f6d333df3a4d53f292cc3f07b09013c0b40c8e7dcb9c03",
+   "data_size": 101,
+   "proof_sha256": "f49b05b941c4d2512b0f0569b57c2592d501ef6036f7965d667eae07b80721aa",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "unknown-notary",
+   "note": "unknown attestation only",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/unknown-notary.txt.ots",
+    "data": "examples/unknown-notary.txt"
+   },
+   "data_sha256": "dcc21d1d1f42a436a2a07fc915dec04db41b83c898845948c3d664b6660f4f91",
+   "data_size": 71,
+   "proof_sha256": "8e9b2d5941745ce822e01c8aedf3725671960d0932699107d4531db7df3c841e",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "osdsp",
+   "note": "extra example in the JS repo",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/osdsp.txt.ots",
+    "data": "examples/osdsp.txt"
+   },
+   "data_sha256": "397a00836979837319bdd350aa93bcc2798e94e08ab00f32f355e5ebe7837c2b",
+   "data_size": 27175,
+   "proof_sha256": "080ccfea9748ea0c7ee1abe0a11d6ce7745bed5b2d881fe1f24b59ba6373ecdd",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "ripemd160-readme",
+   "note": "proof whose header names RIPEMD-160",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/ripemd160/README.md.ots",
+    "data": "examples/ripemd160/README.md"
+   },
+   "data_sha256": "5a440aaad2c31d12c8b912b97a6dbd5b253b97ec120315e7b31ed97aa6f70279",
+   "data_size": 15288,
+   "proof_sha256": "cf8a9f27e6c40b55f14f80c3c6169401a7790c2f8a16e4c21a83c25a01803125",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "sha1-a",
+   "note": "SHA-1 header; file a of the shattered pair",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/sha1/a_or_b.ots",
+    "data": "examples/sha1/a"
+   },
+   "data_sha256": "842a2c7d2f85b25998d5e43fcced0ba3ca570ee0d36bedb23a815d79e614f646",
+   "data_size": 320,
+   "proof_sha256": "0ac37bbc1b8545636597183c7ec2c9f37ff44bf3363d0aa845bc02cfa6e0b5eb",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "sha1-b",
+   "note": "SHA-1 header; file b of the shattered pair (same proof)",
+   "source": {
+    "repo": "opentimestamps/javascript-opentimestamps",
+    "proof": "examples/sha1/a_or_b.ots",
+    "data": "examples/sha1/b"
+   },
+   "data_sha256": "cac8644dba1a9aef70cc268f3794036a2be5b5107109ad742247858fd1a36990",
+   "data_size": 320,
+   "proof_sha256": "0ac37bbc1b8545636597183c7ec2c9f37ff44bf3363d0aa845bc02cfa6e0b5eb",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "different-blockchains",
+   "note": "Bitcoin and Litecoin",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/different-blockchains.txt.ots",
+    "data": "examples/different-blockchains.txt"
+   },
+   "data_sha256": "62c8b090faa21ee5f2e75399d4909e1e27a00ade7dca8f219c6fd34f54de3494",
+   "data_size": 50,
+   "proof_sha256": "f5c9b3c73ee7858e8349d3c1f9c4c78fa13596d7cbc42dd577bd1bb0699891b2",
+   "shipped_info": {
+    "repo": "opentimestamps/java-opentimestamps",
+    "path": "examples/different-blockchains.txt.ots.info"
+   },
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "eth",
+   "note": "Ethereum attestation (java repo)",
+   "source": {
+    "repo": "opentimestamps/java-opentimestamps",
+    "proof": "examples/hello-world.txt.eth.ots",
+    "data": "examples/hello-world.txt.eth"
+   },
+   "data_sha256": "03ba204e50d126e4674c005e04d82e84c21366780af1f43bd54a37816b6ab340",
+   "data_size": 13,
+   "proof_sha256": "771918f30c21ae3dd7c2ae2de3cbf0a5610b0479574d93bf7b52cdd819d4c8ec",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "bitcoin-pdf",
+   "note": "long proof (about 100 levels); the PDF is not in the repo: proof-only",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/bitcoin.pdf.ots",
+    "data": null
+   },
+   "proof_sha256": "3d3ec15890e6ee66cfe6a84d4bb2805fa66e59a569b4fad86d4b8c2a71859620",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "gdp2q25",
+   "note": "proof only; file not in the repo",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/gdp2q25-2nd.pdf.ots",
+    "data": null
+   },
+   "proof_sha256": "0a63adf8a7b47b68d42aec05f365f78a631e64f734b8af5bc594188ee2d751e9",
+   "reference_ots_info": {
+    "exit": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "id": "invalid-bad-major-version",
+   "note": "must be rejected",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/invalid/bad-major-version.ots",
+    "data": null
+   },
+   "proof_sha256": "7e8c585cc6669f216cff6ee2a322cd2e8856d5d878f72aa2b89803188e37a747",
+   "reference_ots_info": {
+    "exit": 1,
+    "stderr": "Invalid timestamp file 'vectors/invalid-bad-major-version/proof.ots': Version 255 detached timestamp files are not supported"
+   }
+  },
+  {
+   "id": "invalid-exceeds-max-msg-length",
+   "note": "must be rejected",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/invalid/exceeds-max-msg-length.ots",
+    "data": null
+   },
+   "proof_sha256": "0adc53bb9768ae961bd40861298af030e059f1915163abbe9177eac389a61905",
+   "reference_ots_info": {
+    "exit": 1,
+    "stderr": "Invalid timestamp file 'vectors/invalid-exceeds-max-msg-length/proof.ots': Invalid timestamp; message invalid for op OpAppend(b'\\xa5\\x1a\\x1d\\x9a\\\\D?\\x82\\x06\\x9b\\x94\\x8f\\xabHe7'): MsgValueError('Result too long; 4112 > 4096')"
+   }
+  },
+  {
+   "id": "invalid-file-digest-type",
+   "note": "must be rejected",
+   "source": {
+    "repo": "opentimestamps/opentimestamps-client",
+    "proof": "examples/invalid/invalid-file-digest-type.ots",
+    "data": null
+   },
+   "proof_sha256": "68aa269dc4ff27a9b76891d9a4423408f10d0413c2c429f9237ce9bfa2ca690b",
+   "reference_ots_info": {
+    "exit": 1,
+    "stderr": "Invalid timestamp file 'vectors/invalid-file-digest-type/proof.ots': Unknown unary op tag 0xf3"
+   }
+  }
+ ]
+}

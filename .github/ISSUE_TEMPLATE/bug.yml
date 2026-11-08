@@ -1,0 +1,24 @@
+name: Bug or disagreement
+description: The page and the script disagree, a proof is mis-explained, or a verdict looks wrong
+labels: [bug]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: [Page, verify_ots.py, ots_stamp.py, Both disagree, Container, Docs]
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations: { required: true }
+  - type: textarea
+    id: proof
+    attributes:
+      label: A proof that shows it
+      description: Attach the .ots (it contains no file content) or the output of `verify_ots.py --json`. Do not attach private files.
+  - type: input
+    id: env
+    attributes:
+      label: Browser or Python version

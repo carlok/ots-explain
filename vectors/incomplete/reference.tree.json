@@ -1,0 +1,50 @@
+{
+ "valid": true,
+ "file_hash_op": "sha256",
+ "digest": "05c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9",
+ "edges": [
+  [
+   "05c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9",
+   "append",
+   "e754bf93806a7ebaa680ef7bd0114bf4",
+   "05c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9e754bf93806a7ebaa680ef7bd0114bf4"
+  ],
+  [
+   "05c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9e754bf93806a7ebaa680ef7bd0114bf4",
+   "sha256",
+   null,
+   "cd567f5aa9f68cfbece1ca17b4b72ad3079a3e4bff80efe131419bd02138e425"
+  ],
+  [
+   "57cfa5c46716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c6",
+   "append",
+   "6fb1ac8d4e4eb0e7",
+   "57cfa5c46716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c66fb1ac8d4e4eb0e7"
+  ],
+  [
+   "6716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c6",
+   "prepend",
+   "57cfa5c4",
+   "57cfa5c46716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c6"
+  ],
+  [
+   "cd567f5aa9f68cfbece1ca17b4b72ad3079a3e4bff80efe131419bd02138e425",
+   "append",
+   "b573e8850cfd9e63d1f043fbb6fc250e",
+   "cd567f5aa9f68cfbece1ca17b4b72ad3079a3e4bff80efe131419bd02138e425b573e8850cfd9e63d1f043fbb6fc250e"
+  ],
+  [
+   "cd567f5aa9f68cfbece1ca17b4b72ad3079a3e4bff80efe131419bd02138e425b573e8850cfd9e63d1f043fbb6fc250e",
+   "sha256",
+   null,
+   "6716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c6"
+  ]
+ ],
+ "attestations": [
+  [
+   "57cfa5c46716df9bd9e83595bce439c58108d8fcc1678f30d4c6731c3f1fa6c79ed712c66fb1ac8d4e4eb0e7",
+   "pending",
+   "https://alice.btc.calendar.opentimestamps.org"
+  ]
+ ]
+}

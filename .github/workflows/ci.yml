@@ -1,0 +1,65 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  python:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          - { os: windows-latest, python: "3.12" }
+          - { os: macos-latest, python: "3.12" }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: { python-version: "${{ matrix.python }}" }
+      - name: Unit tests (standard library only; conformance is skipped without node_modules)
+        run: python -m unittest discover -s test -p 'test_*.py' -v
+  full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: { python-version: "3.12" }
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: pip install coverage
+      - run: npm run typecheck
+      - run: npm run build
+      - name: dist is up to date and small
+        run: |
+          git diff --exit-code -- dist/index.html || { echo "dist/index.html is stale: run npm run build"; exit 1; }
+          test "$(wc -c < dist/index.html)" -lt 153600
+      - run: npm test
+      - run: npm run test:py
+      - run: npm run test:conformance
+      - run: npm run test:browser
+      - name: Fuzz more than the default (both implementations must agree)
+        run: OTS_FUZZ_N=4000 OTS_FUZZ_SEED=${{ github.run_number }} python -m unittest test.test_fuzz -v
+      - name: Page in Firefox and WebKit (the checks that do not depend on Chromium)
+        run: |
+          npx playwright install --with-deps firefox webkit
+          for b in firefox webkit; do OTS_BROWSER=$b node test/browser/smoke.mjs; done
+      - name: Dependencies and licences
+        run: npm audit --omit=dev && npm audit --audit-level=high
+      - name: Coverage
+        run: npm run coverage
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Build and test the image (the maintainer has never run this)
+        run: |
+          docker build --target test -t ots-explain-test .
+          docker run --rm ots-explain-test test

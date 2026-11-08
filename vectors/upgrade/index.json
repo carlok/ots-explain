@@ -1,0 +1,177 @@
+[
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org",
+   "https://bob.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "f008000102030405060708000588960d73d7190103f7ef15",
+    "status": 200
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "",
+    "status": 404
+   }
+  },
+  "expect": {
+   "changed": true,
+   "log": [
+    "https://bob.btc.calendar.opentimestamps.org: not confirmed yet"
+   ],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d5574f008000102030405060708000588960d73d7190103f7ef15f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a970083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+   "status": "complete"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: only alice has it"
+ },
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org",
+   "https://bob.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d7190103f7ef15",
+    "status": 200
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d7190103f7ef15",
+    "status": 200
+   }
+  },
+  "expect": {
+   "changed": true,
+   "log": [],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d5574000588960d73d7190103f7ef15f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a97000588960d73d7190103f7ef15",
+   "status": "complete"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: both have it, merged"
+ },
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org",
+   "https://bob.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "",
+    "status": 404
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "",
+    "status": 500
+   }
+  },
+  "expect": {
+   "changed": false,
+   "log": [
+    "https://alice.btc.calendar.opentimestamps.org: not confirmed yet",
+    "https://bob.btc.calendar.opentimestamps.org: HTTP 500"
+   ],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d55740083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a970083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+   "status": "pending"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: neither has it"
+ },
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org",
+   "https://bob.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "0083dfe30d2ef90c8e0706666f6f626172",
+    "status": 200
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "",
+    "status": 404
+   }
+  },
+  "expect": {
+   "changed": false,
+   "log": [
+    "https://alice.btc.calendar.opentimestamps.org: answer has no Bitcoin attestation yet",
+    "https://bob.btc.calendar.opentimestamps.org: not confirmed yet"
+   ],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d55740083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a970083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+   "status": "pending"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: answer has no Bitcoin attestation"
+ },
+ {
+  "allowed": [
+   "https://bob.btc.calendar.opentimestamps.org/"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d719010101",
+    "status": 200
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d719010102",
+    "status": 200
+   }
+  },
+  "expect": {
+   "changed": true,
+   "log": [
+    "not asking https://alice.btc.calendar.opentimestamps.org: not on the allowed list (use --allow)"
+   ],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d55740083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a97000588960d73d719010102",
+   "status": "complete"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: only bob is allowed"
+ },
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org",
+   "https://bob.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "ffff",
+    "status": 200
+   },
+   "https://bob.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d7190101056a756e6b",
+    "status": 200
+   }
+  },
+  "expect": {
+   "changed": false,
+   "log": [
+    "https://alice.btc.calendar.opentimestamps.org sent an unreadable answer: unknown_op",
+    "https://bob.btc.calendar.opentimestamps.org sent an unreadable answer: trailing_garbage"
+   ],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e892940108efaa174f68e59705757460f4f7d204bd2b535cfd194d9d945418732129404ddbf010839037eef449dec6dac322ca97347c4508fff0106b4023b6edd3a0eeeb09e5d718723b9e08f10457d46515f008eadd66b1688d55740083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267f010a3ad701ef9f10535a84968b5a99d858008f10457d46516f008647b90ea1b270a970083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+   "status": "pending"
+  },
+  "proof": "two-calendars",
+  "title": "two-calendars: unreadable answer"
+ },
+ {
+  "allowed": [
+   "https://alice.btc.calendar.opentimestamps.org"
+  ],
+  "answers": {
+   "https://alice.btc.calendar.opentimestamps.org": {
+    "body_hex": "000588960d73d719010380b518",
+    "status": 200
+   }
+  },
+  "expect": {
+   "changed": true,
+   "log": [],
+   "proof_hex": "004f70656e54696d657374616d7073000050726f6f6600bf89e2e884e89294010805c4f616a8e5310d19d938cfd769864d7f4ccdc2ca8b479b10af83564b097af9f010e754bf93806a7ebaa680ef7bd0114bf408f010b573e8850cfd9e63d1f043fbb6fc250e08f10457cfa5c4f0086fb1ac8d4e4eb0e7000588960d73d719010380b518",
+   "status": "complete"
+  },
+  "proof": "incomplete",
+  "title": "incomplete: one calendar, upgraded"
+ }
+]

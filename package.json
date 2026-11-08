@@ -1,0 +1,24 @@
+{
+  "name": "ots-explain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Explain an OpenTimestamps proof hop by hop: static page + stdlib Python script that must agree.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "node web/build.mjs",
+    "typecheck": "tsc -p .",
+    "test": "node --test 'test/js/*.test.mjs'",
+    "test:py": "python3 -m unittest discover -s test -p 'test_*.py'",
+    "test:conformance": "python3 -m unittest test.test_conformance test.test_conformance_stamp -v",
+    "test:browser": "node test/browser/smoke.mjs",
+    "test:all": "npm run typecheck && npm run build && npm test && npm run test:py && npm run test:browser",
+    "coverage": "node --test --experimental-test-coverage 'test/js/*.test.mjs' && coverage run --rcfile=.coveragerc -m unittest discover -s test -p 'test_*.py' && coverage report --rcfile=.coveragerc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "playwright": "^1.63.0",
+    "typescript": "^5.6.0"
+  }
+}

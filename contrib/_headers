@@ -1,0 +1,9 @@
+# Netlify / Cloudflare Pages style headers for hosting dist/index.html. The page also carries the same CSP in a
+# <meta> tag (which works from file://); real headers add what a meta tag cannot: frame-ancestors and the rest.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'sha256-REPLACE_WITH_THE_HASH_IN_dist/index.html'; style-src 'sha256-REPLACE_WITH_THE_HASH_IN_dist/index.html'; img-src data:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Cache-Control: public, max-age=300

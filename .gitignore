@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+.coverage
+__pycache__/
+web/build/
+*.bak
+test/browser/.*.ots
+vectors/wild/

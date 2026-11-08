@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.ots binary
+*.bin binary
+vectors/** -diff linguist-vendored
+dist/** linguist-generated
+package-lock.json linguist-generated

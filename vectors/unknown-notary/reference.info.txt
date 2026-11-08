@@ -1,0 +1,10 @@
+File sha256 hash: dcc21d1d1f42a436a2a07fc915dec04db41b83c898845948c3d664b6660f4f91
+Timestamp:
+append 5ddec0c99aa0bfe7700906157dd765bb
+sha256
+append 9ebd2d5ddf5884d9e957ea4e1f746fea
+sha256
+prepend 57e89d28
+append fd28d6202633185c
+verify UnknownAttestation(b'\x01\x02\x03\x04\x05\x06\x07\x08', b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+

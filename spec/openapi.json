@@ -1,0 +1,830 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ots-explain API",
+    "version": "1",
+    "description": "A small local REST API in front of verify_ots.py and ots_stamp.py. Takes digests, never files. Network features are off unless the server was started with --allow-network. See python/ots_api.py.",
+    "license": {
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8787"
+    }
+  ],
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "summary": "Is it up; which features are on",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "This document",
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 JSON"
+          }
+        }
+      }
+    },
+    "/v1/verify": {
+      "post": {
+        "summary": "Verify (explain) a proof",
+        "description": "Returns the report of spec/report.schema.json as canonical JSON, byte-identical to `verify_ots.py --json`. Send either JSON {proof_b64, digest?, ledger?, format?, steps?} or the raw .ots bytes with query parameters digest, ledger=1, format=text, steps=1. The HTTP status is 200 whatever the verdict; read verdict.status (also in the X-Verdict header). ledger needs --allow-network, and only allow-listed Esplora servers may be named.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            },
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "digest",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^([0-9a-fA-F]{2})+$"
+            }
+          },
+          {
+            "name": "ledger",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1",
+                "true",
+                "default"
+              ]
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "text"
+              ]
+            }
+          },
+          {
+            "name": "steps",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The report (or plain text when format=text)",
+            "headers": {
+              "X-Verdict": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "SKIP"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "report.schema.json"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/stamp": {
+      "post": {
+        "summary": "Stamp a SHA-256 digest with public calendars",
+        "description": "Needs --allow-network. Only calendars on the allow-list may be named. The calendars receive SHA-256(digest||16 random bytes), nothing else. The result is a PENDING proof.",
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StampRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StampResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/upgrade": {
+      "post": {
+        "summary": "Ask the calendars named in a pending proof for the Bitcoin path",
+        "description": "Needs --allow-network.",
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpgradeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpgradeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/permalink": {
+      "post": {
+        "summary": "Build a #h=&ots= link",
+        "description": "",
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermalinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermalinkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/permalink/decode": {
+      "post": {
+        "summary": "Read a link back",
+        "description": "",
+        "security": [
+          {},
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermalinkDecodeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermalinkDecodeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Only when the server was started with --token."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "bad_request",
+                  "bad_proof",
+                  "unauthorized",
+                  "network_disabled",
+                  "not_found",
+                  "length_required",
+                  "too_large",
+                  "server_not_allowed",
+                  "calendar_not_allowed",
+                  "no_calendar",
+                  "internal"
+                ]
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "ok",
+          "version",
+          "api",
+          "report_spec",
+          "network"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "string"
+          },
+          "api": {
+            "type": "string"
+          },
+          "report_spec": {
+            "type": "string"
+          },
+          "network": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "required": [
+          "proof_b64"
+        ],
+        "properties": {
+          "proof_b64": {
+            "type": "string",
+            "contentEncoding": "base64"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^([0-9a-fA-F]{2})+$"
+          },
+          "ledger": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "servers"
+                ],
+                "properties": {
+                  "servers": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "base"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "base": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "format": {
+            "enum": [
+              "json",
+              "text"
+            ]
+          },
+          "steps": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StampRequest": {
+        "type": "object",
+        "required": [
+          "digest"
+        ],
+        "properties": {
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "calendars": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "StampResponse": {
+        "type": "object",
+        "required": [
+          "proof_b64",
+          "status",
+          "log"
+        ],
+        "properties": {
+          "proof_b64": {
+            "type": "string"
+          },
+          "status": {
+            "const": "pending"
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UpgradeRequest": {
+        "type": "object",
+        "required": [
+          "proof_b64"
+        ],
+        "properties": {
+          "proof_b64": {
+            "type": "string"
+          }
+        }
+      },
+      "UpgradeResponse": {
+        "type": "object",
+        "required": [
+          "proof_b64",
+          "changed",
+          "status",
+          "log"
+        ],
+        "properties": {
+          "proof_b64": {
+            "type": "string"
+          },
+          "changed": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "pending",
+              "nothing_to_do"
+            ]
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PermalinkRequest": {
+        "type": "object",
+        "required": [
+          "digest",
+          "proof_b64",
+          "base"
+        ],
+        "properties": {
+          "digest": {
+            "type": "string"
+          },
+          "proof_b64": {
+            "type": "string"
+          },
+          "base": {
+            "type": "string"
+          },
+          "proof_url": {
+            "type": "string"
+          }
+        }
+      },
+      "PermalinkResponse": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PermalinkDecodeRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "PermalinkDecodeResponse": {
+        "type": "object",
+        "required": [
+          "digest",
+          "proof_b64",
+          "proof_url"
+        ],
+        "properties": {
+          "digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "proof_b64": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "proof_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

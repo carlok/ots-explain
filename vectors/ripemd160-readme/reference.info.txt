@@ -1,0 +1,26 @@
+File ripemd160 hash: 0423ced4914bc5e47aeda314b5993b7bd796fe00
+Timestamp:
+append 63cd5900385332f9b4d1a26fc8308d10
+sha256
+ -> append 84dabc8c98c925a3b4bbf6dce8329220
+    sha256
+    prepend 5aaa523d
+    append 6e335d9022fb8e4d
+    verify PendingAttestation('https://bob.btc.calendar.opentimestamps.org')
+ -> append ae0c08b1f77675fbc50b1e8be47045f7
+    sha256
+    append 169236a03672969e9f21bc781c8b1615768714f5463d666c5f33a99a9476dc66
+    sha256
+    append 7c88ef76166c184737d789eeeb092da1b92c77ef311b5dd115194f751b290e60
+    sha256
+    prepend 5aaa523d
+    append 4664e75b695f322b
+    verify PendingAttestation('https://alice.btc.calendar.opentimestamps.org')
+ -> append c40738545d1673ffc7f69abfa027e52f
+    sha256
+    prepend c9af2af9b5ce1884303370f73bd151b1e25e0464660ce56a02d8b98fc0e8dca4
+    sha256
+    prepend 5aaa523d
+    append d6c357cdf91e4b16
+    verify PendingAttestation('https://finney.calendar.eternitywall.com')
+

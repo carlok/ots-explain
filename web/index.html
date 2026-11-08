@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src {{SCRIPT_HASH}}; style-src {{STYLE_HASH}}; img-src data:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Check or create an OpenTimestamps proof one hop at a time. Everything is computed in your browser; nothing is uploaded unless you press a button that says so.">
+<meta name="referrer" content="no-referrer">
+<title>ots-explain — check an OpenTimestamps proof</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233b5bdb'/%3E%3Cpath d='M9 17l5 5 9-12' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>{{CSS}}</style>
+</head>
+<body>
+<a class="skip" href="#inputs">Skip to the inputs</a>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true">✓</span> ots-explain</div>
+  <button type="button" id="theme" class="ghost">Theme: auto</button>
+</header>
+<main>
+  <section class="hero">
+    <h1>Check or create an OpenTimestamps proof, one hop at a time.</h1>
+    <p><strong>Check:</strong> pick a file and its <code>.ots</code> proof; the page recomputes every hash in your browser and shows five plain steps, ending in a verdict you can check against the Bitcoin chain. <strong>Stamp:</strong> hash a file here and ask the free public calendars to timestamp it; later, upgrade the proof and check it.</p>
+    <p class="privacy"><strong>Nothing is uploaded.</strong> Your file is hashed in this tab. The page makes no network request unless you press a button that says so.</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="What do you want to do?">
+    <button type="button" role="tab" id="tab-check" aria-selected="true" aria-controls="view-check">Check a proof</button>
+    <button type="button" role="tab" id="tab-stamp" aria-selected="false" aria-controls="view-stamp" tabindex="-1">Stamp a file</button>
+  </div>
+
+  <div class="status"><p id="live" role="status" aria-live="polite">Pick an .ots proof to begin.</p><progress id="progress" hidden value="0" max="1"></progress><span id="busy" hidden class="spin" aria-hidden="true"></span></div>
+
+  <div id="view-check" role="tabpanel" aria-labelledby="tab-check">
+  <section id="inputs" class="inputs" aria-label="Inputs">
+    <label class="drop" id="drop-file">
+      <input type="file" id="file">
+      <span class="dt">1 · The file</span>
+      <span class="dh">Choose or drop the file that was timestamped</span>
+      <span class="chosen" id="file-name"></span>
+    </label>
+    <label class="drop" id="drop-proof">
+      <input type="file" id="proof" accept=".ots">
+      <span class="dt">2 · The proof</span>
+      <span class="dh">Choose or drop its <code>.ots</code> file</span>
+      <span class="chosen" id="proof-name"></span>
+    </label>
+    <div class="or">
+      <label for="digest">No file at hand? Paste its hash (hex) instead</label>
+      <input type="text" id="digest" placeholder="e.g. 945ad1a0…877f" spellcheck="false" autocomplete="off" inputmode="text">
+    </div>
+  </section>
+
+  <div class="note-card" id="link-note" hidden>
+    <p>This link points to a proof at <code id="link-url"></code>. Nothing was fetched yet.</p>
+    <button type="button" id="fetch-proof">Fetch the proof from there</button>
+  </div>
+
+  <div id="result" hidden></div>
+  </div>
+
+  <div id="view-stamp" role="tabpanel" aria-labelledby="tab-stamp" hidden>
+    <section class="inputs single" aria-label="File to stamp">
+      <label class="drop" id="drop-sfile">
+        <input type="file" id="sfile">
+        <span class="dt">The file to stamp</span>
+        <span class="dh">Choose or drop any file. It is hashed here and never sent.</span>
+        <span class="chosen" id="sfile-name"></span>
+      </label>
+      <div class="or">
+        <label for="sdigest">Or paste the SHA-256 of the file (64 hex characters)</label>
+        <input type="text" id="sdigest" placeholder="e.g. 03ba204e…b340" spellcheck="false" autocomplete="off">
+      </div>
+    </section>
+    <div id="stamp-out"></div>
+  </div>
+
+
+</main>
+<aside class="support" aria-labelledby="support-h">
+  <h2 id="support-h">Keep the free calendars running</h2>
+  <p>Stamping is free because volunteers run the public calendar servers and pay the Bitcoin fees. OpenTimestamps says they rely on donations, accepted in bitcoin (some also Lightning). Each calendar's own page shows its wallet address; this page deliberately carries no addresses, so a copy of it can never point you somewhere else. Open the calendar you used and donate from there:</p>
+  <ul>
+    <li><a href="https://alice.btc.calendar.opentimestamps.org/" target="_blank" rel="noopener noreferrer">alice.btc.calendar.opentimestamps.org</a></li>
+    <li><a href="https://bob.btc.calendar.opentimestamps.org/" target="_blank" rel="noopener noreferrer">bob.btc.calendar.opentimestamps.org</a></li>
+    <li><a href="https://finney.calendar.eternitywall.com/" target="_blank" rel="noopener noreferrer">finney.calendar.eternitywall.com</a></li>
+    <li><a href="https://btc.calendar.catallaxy.com/" target="_blank" rel="noopener noreferrer">btc.calendar.catallaxy.com</a></li>
+  </ul>
+  <p class="note">These links only open the sites; the page sends nothing. Compare the address on the calendar's page with <a href="https://opentimestamps.org/" target="_blank" rel="noopener noreferrer">opentimestamps.org</a> before sending, and never send more than you can afford to lose.</p>
+</aside>
+<footer>
+  <p>ots-explain <span id="version"></span> · Apache-2.0 · the same five steps are in <code>python/verify_ots.py</code>; both must print identical JSON for every test vector. This is not SPV: it trusts the explorers you ask (two that agree are better than one).</p>
+</footer>
+<script>{{JS}}</script>
+</body>
+</html>

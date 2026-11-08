@@ -1,0 +1,3 @@
+# Every 6 hours, at a minute that is not :00 (be kind to the free calendars). Edit the paths.
+# Proofs younger than --min-interval (default 1 h) are not asked again.
+17 */6 * * *  /usr/bin/python3 $HOME/ots-explain/python/ots_stamp.py watch $HOME/proofs --ledger >> $HOME/proofs/watch.log 2>&1

@@ -1,0 +1,74 @@
+{
+ "arg_length": {
+  "error": "arg_length"
+ },
+ "bad_attestation_payload": {
+  "error": "bad_attestation_payload"
+ },
+ "bad_magic": {
+  "error": "bad_magic"
+ },
+ "bad_uri": {
+  "error": "bad_uri"
+ },
+ "bitcoin_no_transaction": {
+  "error": null
+ },
+ "branching_and_empty_arg_limit": {
+  "error": null
+ },
+ "depth_255": {
+  "error": null
+ },
+ "height_too_large": {
+  "error": "height_too_large"
+ },
+ "keccak_and_ripemd_ops": {
+  "error": null
+ },
+ "msg_too_long": {
+  "error": "msg_too_long"
+ },
+ "payload_too_long": {
+  "error": "payload_too_long"
+ },
+ "recursion_limit": {
+  "error": "recursion_limit"
+ },
+ "repeated_op": {
+  "error": "repeated_op"
+ },
+ "result_too_long": {
+  "error": "result_too_long"
+ },
+ "reverse_and_hexlify": {
+  "error": null
+ },
+ "ripemd160_header": {
+  "error": null
+ },
+ "sha1_header": {
+  "error": null
+ },
+ "trailing_garbage": {
+  "error": "trailing_garbage"
+ },
+ "truncated": {
+  "error": "truncated"
+ },
+ "unknown_file_hash_op": {
+  "error": "unknown_file_hash_op"
+ },
+ "unknown_litecoin_ethereum": {
+  "error": null
+ },
+ "unknown_op": {
+  "error": "unknown_op"
+ },
+ "unsupported_version": {
+  "error": "unsupported_version"
+ },
+ "varuint_too_long": {
+  "error": "varuint_too_long"
+ }
+}

@@ -1,0 +1,11 @@
+[run]
+source = python
+branch = True
+omit = python/__pycache__/*
+
+[report]
+show_missing = True
+skip_empty = True
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
