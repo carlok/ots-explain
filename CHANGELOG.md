@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 ## [Unreleased]
 
 ### Fixed
+- `tools/e2e_real.sh`: the `wild` step runs only when `GH_TOKEN` is set and is reported as skipped otherwise, instead of failing with a 401.
 - `tools/wild_diff.py`: GitHub's code search answers 401 without a token, so `./podman.sh wild` crashed with a traceback. It now reads `GH_TOKEN` (or `GITHUB_TOKEN`), sends it to api.github.com only, does not retry 401/403/404, and says what to set. `podman.sh wild` passes `GH_TOKEN` through. `test/test_wild_diff.py`: 5 tests.
 - `podman.sh cli` ran as the image's uid 10001, which cannot read or write a folder you own ("Permission denied" on `stamp`, `verify`, `upgrade`). It now runs as you (`--userns=keep-id --user UID` for Podman, `--user UID:GID` for Docker). `podman.sh help` also printed code after the usage text; it now stops at `set -eu`.
 - `Containerfile`, `test` target: it copied `web/build`, which the web stage never produces (the tests build it themselves), so `podman build --target test` failed. The line is gone.
