@@ -259,7 +259,25 @@ try {
   const pj = readFileSync(await dl4.path(), "utf8");
   const pyOn = spawnSync("python3", ["-I", join(root, "python/verify_ots.py"), V("hello-world", "data.bin"), up, "--esplora", cal.esplora, "--yes", "--json"], { encoding: "utf8" });
   check(pyOn.status === 0 && pyOn.stdout === pj, "the page's JSON for the stamped+upgraded proof equals python's, byte for byte", `exit ${pyOn.status}`);
+  { // the page says what is original about it, and it must stay true: two implementations, two explorers
+    const why = await p5.locator("#why-trust").innerText();
+    check(/two independent implementations/.test(why) && /TypeScript/.test(why) && /Python/.test(why), "the page says it is one of two independent implementations (TypeScript and Python)", why);
+    check(/Two explorers must agree/.test(why), "the page says two explorers must agree", why);
+  }
   await p5.close();
+
+  // 12b. a real calendar hangs its pending attestation on a 44-byte node (88 hex digits), not a 32-byte one: the upgrade
+  // plan must still list the GET (SPEC 12.7 puts no length condition on the node). Nothing is clicked, so nothing is sent.
+  const p5b = await ctx.newPage(); const r5b = requests.length;
+  await p5b.goto(page_url);
+  await p5b.setInputFiles("#file", V("two-calendars", "data.bin"));
+  await p5b.setInputFiles("#proof", V("two-calendars", "proof.ots"));
+  await p5b.waitForSelector("#upgrade");
+  const uplan = (await p5b.textContent("#uplan")).split("\n");
+  check(uplan.length === 2 && uplan.every((l) => /^GET https:\/\/(alice|bob)\.btc\.calendar\.opentimestamps\.org\/timestamp\/[0-9a-f]{88}$/.test(l)), "a real calendar's 44-byte pending node is on the upgrade plan", uplan.join(" | "));
+  check(!(await p5b.$eval("#upgrade", (b) => b.disabled)), "upgrade is enabled for the known calendars of a real proof");
+  check(requests.length === r5b, "listing the plan sends nothing");
+  await p5b.close();
 
   // 13. hostile input: file names, ?proof= and #h= carrying markup or javascript: must stay inert text
   const p6 = await ctx.newPage(); const rh = requests.length;

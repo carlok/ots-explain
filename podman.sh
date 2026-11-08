@@ -10,13 +10,20 @@
 #   ./podman.sh cli ARGS...     verify_ots.py / ots_stamp.py in the current folder:  cli verify f f.ots | cli stamp f | cli upgrade f.ots
 #   ./podman.sh live-check [--yes]   list the real explorers it would ask; add --yes to ask them
 #   ./podman.sh record [--yes]   list, or with --yes record, real explorer answers into ./vectors/explorer/recorded-*
-#   ./podman.sh wild            diff both implementations on real-world proofs fetched from GitHub (nothing is saved on the host)
+#   ./podman.sh wild            diff both implementations on real-world proofs fetched from GitHub (needs GH_TOKEN in the environment:
+#                               GitHub's code search refuses anonymous calls; nothing is saved on the host)
+#   ./podman.sh hero            retake docs/hero.png (the page proving vectors/real/ against the two public explorers; needs the network)
 #   ./podman.sh repo [owner/name]   create the private GitHub repo (needs GH_TOKEN in the environment; writes ./.git)
 #   ./podman.sh clean           remove the images this script built
 set -eu
 cd "$(dirname "$0")"
 C="${CONTAINER:-podman}"
 cmd="${1:-help}"; [ $# -gt 0 ] && shift
+# -it only when stdin is a terminal: without one (an agent's shell, cron, a pipe) `run -it` fails.
+TTY=""; [ -t 0 ] && TTY=1
+# The runtime image runs as uid 10001, which can neither read nor write a folder owned by you. Run `cli` as you instead:
+# Podman needs keep-id for that (on macOS the machine's user has your uid), Docker takes --user directly.
+if [ "$C" = podman ]; then WHO="--userns=keep-id --user $(id -u)"; else WHO="--user $(id -u):$(id -g)"; fi
 ci()      { $C build -q --target ci -t ots-explain-ci . >/dev/null; }
 runtime() { $C build -q --target runtime -t ots-explain . >/dev/null; }
 case "$cmd" in
@@ -26,12 +33,13 @@ case "$cmd" in
   serve)     runtime; $C run --rm -p 127.0.0.1:8080:8080 ots-explain serve ;;
   api)       runtime; [ -n "${OTS_API_TOKEN:-}" ] || { echo "set OTS_API_TOKEN first (the API refuses a container bind without a token)" >&2; exit 2; }
              $C run --rm -p 127.0.0.1:8787:8787 -e OTS_API_TOKEN ots-explain api "$@" ;;
-  cli)       runtime; $C run --rm -it -v "$PWD:/work:Z" -w /work ots-explain "$@" ;;
+  cli)       runtime; $C run --rm ${TTY:+-it} $WHO -v "$PWD:/work:Z" -w /work ots-explain "$@" ;;
   live-check) ci; $C run --rm ots-explain-ci python3 tools/live_check.py "$@" ;;
   record)    ci; mkdir -p vectors/explorer; $C run --rm -v "$PWD/vectors/explorer:/app/vectors/explorer:Z" ots-explain-ci python3 tools/record_explorer.py "$@" ;;
-  wild)      ci; $C run --rm ots-explain-ci python3 tools/wild_diff.py "$@" ;;
+  wild)      ci; $C run --rm -e GH_TOKEN ots-explain-ci python3 tools/wild_diff.py "$@" ;;
+  hero)      ci; $C run --rm --ipc=host -v "$PWD/tools/screenshot.mjs:/app/tools/screenshot.mjs:Z" -v "$PWD/docs:/out:Z" ots-explain-ci sh -c 'npm run build >/dev/null && node tools/screenshot.mjs /out/hero.png' ;;
   repo)      [ -n "${GH_TOKEN:-}" ] || { echo "set GH_TOKEN (a GitHub token with repo scope) first" >&2; exit 2; }
              $C run --rm -e GH_TOKEN -v "$PWD:/src:Z" -w /src docker.io/library/alpine:3 sh -c 'apk add --no-cache -q git github-cli && git config --global user.name "${GIT_AUTHOR_NAME:-ots-explain}" && git config --global user.email "${GIT_AUTHOR_EMAIL:-noreply@example.invalid}" && git config --global --add safe.directory /src && sh tools/create_github_repo.sh "$@"' sh "$@" ;;
   clean)     $C rmi -f ots-explain-ci ots-explain 2>/dev/null || true ;;
-  help|--help|-h|*) sed -n '2,19p' "$0" ;;
+  help|--help|-h|*) sed -n '2,/^set -eu/{/^set -eu/!p;}' "$0" ;;
 esac
