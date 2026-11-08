@@ -7,7 +7,7 @@ import {
   ledgerPlan, parseProof, type Report, type Server, type FetchText, type FileInput,
 } from "../core/index.js";
 import stepsSpec from "../../../spec/steps.json";
-import { KIND_NAME, MSG, paths, renderText, when } from "./text.js";
+import { KIND_NAME, MSG, paths, renderText, when, type Path } from "./text.js";
 
 declare const __VERSION__: string;
 
@@ -72,8 +72,8 @@ function sizeText(n: number): string {
 }
 
 function showChosen(): void {
-  $("file-name").textContent = file ? `${file.name} · ${sizeText(file.size)}` : "";
-  $("proof-name").textContent = proofBytes ? `${proofLabel} · ${sizeText(proofBytes.length)}` : "";
+  $("file-name").textContent = file ? `${file.name}, ${sizeText(file.size)}` : "";
+  $("proof-name").textContent = proofBytes ? `${proofLabel}, ${sizeText(proofBytes.length)}` : "";
   $("drop-file").classList.toggle("has", !!file);
   $("drop-proof").classList.toggle("has", !!proofBytes);
 }
@@ -261,8 +261,7 @@ function verdictBanner(r: Report): HTMLElement {
     sub = [h("ul", null, ...items.map((t) => h("li", null, t)))];
   }
   return h("section", { class: "verdict " + v.status, "aria-labelledby": "verdict-title" },
-    h("div", { class: "vmark", "aria-hidden": "true" }, BADGE[v.status][0]),
-    h("div", null, h("h2", { id: "verdict-title" }, title), h("div", { class: "vsub" }, ...sub)));
+    h("h2", { id: "verdict-title" }, title), h("div", { class: "vsub" }, ...sub));
 }
 
 function stepCard(r: Report, i: number): HTMLElement {
@@ -273,7 +272,7 @@ function stepCard(r: Report, i: number): HTMLElement {
   const spec = stepsSpec.steps[i];
 
   if (s.id === "file_hash") {
-    if (r.input.mode === "file") body.append(h("p", { class: "meta" }, `File: ${file?.name ?? ""} · ${r.input.size} bytes`));
+    if (r.input.mode === "file") body.append(h("p", { class: "meta" }, `File ${file?.name ?? ""}, ${r.input.size} bytes`));
     if (r.input.digest) body.append(h("p", { class: "meta" }, `${r.input.digest_alg ?? ""} of your input`, mono(r.input.digest)));
     if (r.proof && s.status === "FAIL") body.append(h("p", { class: "meta" }, "digest the proof names", mono(r.proof.digest)));
   } else if (s.id === "structure" && r.proof) {
@@ -287,7 +286,7 @@ function stepCard(r: Report, i: number): HTMLElement {
       const what = a.height !== null ? "block " + a.height : a.uri ?? "tag " + a.tag;
       const note = a.kind === "pending" ? "Not in a block yet: the calendar will add the Bitcoin path after a few hours (upgrade the proof, then check again)."
         : a.kind === "bitcoin" ? "" : "Not checked by this tool.";
-      return h("li", null, h("span", { class: "chip " + a.kind }, KIND_NAME[a.kind]), ` attestation ${a.index} · ${what}`, note && h("div", { class: "note" }, note));
+      return h("li", null, h("span", { class: "chip " + a.kind }, KIND_NAME[a.kind]), ` attestation ${a.index}: ${what}`, note && h("div", { class: "note" }, note));
     })));
   } else if (s.id === "hash_steps" && r.proof) {
     for (const p of paths(r)) {
@@ -298,7 +297,7 @@ function stepCard(r: Report, i: number): HTMLElement {
         if (hp.phase && hp.phase !== last) { last = hp.phase; table.append(h("div", { class: "phase", role: "row" }, h("span", { role: "cell" }, PHASE_TEXT[last]))); }
         table.append(hop(String(hp.n), hp.op, hp.arg ?? "", hp.digest));
       }
-      body.append(h("details", { class: "path", open: showHops }, h("summary", null, `Attestation ${p.attestation} · ${KIND_NAME[p.kind]} · ${p.hops.length} hops`), table));
+      body.append(chainSummary(r, p), h("details", { class: "path", open: showHops }, h("summary", null, `Every hop to attestation ${p.attestation} (${p.hops.length})`), table));
     }
   } else if (s.id === "ledger") {
     ledgerBody(r, body);
@@ -310,6 +309,27 @@ function stepCard(r: Report, i: number): HTMLElement {
   return h("li", { class: "step " + s.status, id: "step-" + s.id },
     h("div", { class: "num", "aria-hidden": "true" }, String(i + 1)),
     h("div", { class: "sbody" }, h("div", { class: "shead" }, title, badge(s.status)), h("p", { class: "why" }, spec.why), body));
+}
+
+const PHASE_NAME: Record<string, string> = {
+  "calendar's tree": "the calendar's tree", "the transaction": "the Bitcoin transaction", "the block's merkle path": "the block's merkle path",
+};
+const shortHex = (d: string) => h("code", { class: "hex", title: d }, d.length > 24 ? d.slice(0, 10) + "\u2026" + d.slice(-10) : d);
+
+/** The chain at a glance: the digest you start from, the digest each phase ends on, and where the path ends. */
+function chainSummary(r: Report, p: Path): HTMLElement {
+  const att = r.proof!.attestations[p.attestation];
+  const groups: { name: string; count: number; out: string }[] = [];
+  for (const hp of p.hops) {
+    const name = hp.phase ? PHASE_NAME[hp.phase] : att.kind === "pending" ? "to the calendar's commitment" : "to the attestation";
+    const g = groups[groups.length - 1];
+    if (g && g.name === name) { g.count++; g.out = hp.digest; } else groups.push({ name, count: 1, out: hp.digest });
+  }
+  const end = att.kind === "bitcoin" ? `Bitcoin block ${att.height}` : att.kind === "pending" ? `promised by ${att.uri ?? "a calendar"}, not in a block yet` : `${KIND_NAME[att.kind]} attestation, not checked here`;
+  return h("ol", { class: "chain", "aria-label": `Attestation ${p.attestation}: from your digest to ${end}` },
+    h("li", { class: "link start" }, h("span", { class: "lname" }, "your digest"), shortHex(p.start)),
+    ...groups.map((g) => h("li", { class: "link" }, h("span", { class: "lname" }, g.name, h("span", { class: "lcount" }, `${g.count} hop${g.count === 1 ? "" : "s"}`)), shortHex(g.out))),
+    h("li", { class: "link end " + att.kind }, h("span", { class: "lname" }, end)));
 }
 
 const PHASE_TEXT: Record<string, string> = {
@@ -336,10 +356,10 @@ function ledgerBody(r: Report, body: HTMLElement): void {
   const bitcoin = r.proof?.attestations.some((a) => a.kind === "bitcoin");
   if (r.ledger) {
     for (const a of r.ledger.attestations) {
-      body.append(h("h4", null, `Attestation ${a.attestation}`, a.agree === true ? h("span", { class: "note inline" }, " · servers agree") : a.agree === false ? h("span", { class: "note inline bad" }, " · servers disagree") : h("span", { class: "note inline" }, " · one server, nothing to compare")));
+      body.append(h("h4", null, `Attestation ${a.attestation}`, a.agree === true ? h("span", { class: "note inline" }, ": the servers agree") : a.agree === false ? h("span", { class: "note inline bad" }, ": the servers disagree") : h("span", { class: "note inline" }, ": one server, nothing to compare")));
       for (const sv of a.servers) {
         body.append(h("details", { class: "server", open: sv.status !== "PASS" || showHops },
-          h("summary", null, badge(sv.status), " ", sv.server, sv.time !== null && h("span", { class: "note inline" }, " · header time " + when(sv.time))),
+          h("summary", null, badge(sv.status), " ", sv.server, sv.time !== null && h("span", { class: "note inline" }, ", header time " + when(sv.time))),
           h("ul", { class: "checks" }, ...sv.checks.map((c) => h("li", null, badge(c.status), ` ${CHECK_TITLE[c.id]}`, c.status !== "PASS" && h("span", { class: "note inline" }, " — " + (LEDGER_CODE[c.code] ?? c.code)))))));
       }
     }
@@ -349,7 +369,7 @@ function ledgerBody(r: Report, body: HTMLElement): void {
   const links = r.proof?.attestations.flatMap((a) => a.where_to_look) ?? [];
   if (links.length) {
     body.append(h("details", { class: "look" }, h("summary", null, "Look for yourself (opens a third-party site)"),
-      h("ul", null, ...links.map((l) => h("li", null, h("a", { href: l.url, target: "_blank", rel: "noopener noreferrer" }, `${l.server} · ${l.kind === "raw_hex" ? "raw transaction" : l.kind === "tx" ? "transaction" : "block"}`), " ", h("span", { class: "note inline" }, l.url))))));
+      h("ul", null, ...links.map((l) => h("li", null, h("a", { href: l.url, target: "_blank", rel: "noopener noreferrer" }, `${l.server}: ${l.kind === "raw_hex" ? "raw transaction" : l.kind === "tx" ? "transaction" : "block"}`), " ", h("span", { class: "note inline" }, l.url))))));
   }
 }
 
@@ -534,7 +554,7 @@ function calendarList(): string[] {
 function renderStamp(): void {
   const out = $("stamp-out");
   out.textContent = "";
-  $("sfile-name").textContent = stamp.file ? `${stamp.file.name} · ${sizeText(stamp.file.size)}` : stamp.digest ? "a pasted hash" : "";
+  $("sfile-name").textContent = stamp.file ? `${stamp.file.name}, ${sizeText(stamp.file.size)}` : stamp.digest ? "a pasted hash" : "";
   $("drop-sfile").classList.toggle("has", !!stamp.digest);
   if (!stamp.digest) return;
   const digest = stamp.digest;
@@ -562,9 +582,9 @@ function renderStamp(): void {
   go.addEventListener("click", () => void sendStamp());
 
   out.append(
-    h("section", { class: "card" }, h("h3", null, "1 · The file's fingerprint"),
+    h("section", { class: "card" }, h("h3", null, "1. The file's fingerprint"),
       h("p", { class: "meta" }, "SHA-256", mono(hex(digest)))),
-    h("section", { class: "card", "aria-labelledby": "h-ask" }, h("h3", { id: "h-ask", tabindex: "-1" }, "2 · Ask the calendars"),
+    h("section", { class: "card", "aria-labelledby": "h-ask" }, h("h3", { id: "h-ask", tabindex: "-1" }, "2. Ask the calendars"),
       h("p", null, "A calendar is a free public server that collects many commitments and writes one of them into a Bitcoin transaction every few hours. You will send it a ", h("em", null, "commitment"), ": the SHA-256 of your file's hash plus a random 16-byte number that stays inside your .ots. The file, its hash and the random number are not sent, so the calendar learns nothing about the file."),
       h("fieldset", null, h("legend", null, "Ask these calendars"), ...boxes,
         h("label", { class: "custom" }, h("span", null, "Another calendar (optional)"), custom), err,
@@ -578,7 +598,7 @@ function renderStamp(): void {
 
 function stampResult(): HTMLElement {
   const name = (stamp.file?.name ?? hex(stamp.digest!).slice(0, 12)) + ".ots";
-  const card = h("section", { class: "card", "aria-labelledby": "h-sres" }, h("h3", { id: "h-sres", tabindex: "-1" }, "3 · The proof"),
+  const card = h("section", { class: "card", "aria-labelledby": "h-sres" }, h("h3", { id: "h-sres", tabindex: "-1" }, "3. The proof"),
     h("ul", { class: "log" }, ...stamp.log.map((l) => h("li", { class: /accepted/.test(l) ? "ok" : "no" }, l))));
   if (stamp.bytes) {
     const bytes = stamp.bytes;

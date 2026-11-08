@@ -8,20 +8,20 @@
 <meta name="description" content="Check or create an OpenTimestamps proof one hop at a time. Everything is computed in your browser; nothing is uploaded unless you press a button that says so.">
 <meta name="referrer" content="no-referrer">
 <title>ots-explain — check an OpenTimestamps proof</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233b5bdb'/%3E%3Cpath d='M9 17l5 5 9-12' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%2317201b'/%3E%3Cpath d='M10 7v13' stroke='%23e4eae5' stroke-width='2.4'/%3E%3Ccircle cx='10' cy='7' r='2.6' fill='%23e4eae5'/%3E%3Ccircle cx='10' cy='14' r='2.6' fill='%23e4eae5'/%3E%3Cpath d='M10 20l5 5-5 5-5-5z' transform='translate(0 -3)' fill='%23f2a33a'/%3E%3C/svg%3E">
 <style>{{CSS}}</style>
 </head>
 <body>
 <a class="skip" href="#inputs">Skip to the inputs</a>
 <header class="top">
-  <div class="brand"><span class="logo" aria-hidden="true">✓</span> ots-explain</div>
+  <div class="brand">ots-explain</div>
   <button type="button" id="theme" class="ghost">Theme: auto</button>
 </header>
 <main>
   <section class="hero">
-    <h1>Check or create an OpenTimestamps proof, one hop at a time.</h1>
-    <p><strong>Check:</strong> pick a file and its <code>.ots</code> proof; the page recomputes every hash in your browser and shows five plain steps, ending in a verdict you can check against the Bitcoin chain. <strong>Stamp:</strong> hash a file here and ask the free public calendars to timestamp it; later, upgrade the proof and check it.</p>
-    <p class="privacy"><strong>Nothing is uploaded.</strong> Your file is hashed in this tab. The page makes no network request unless you press a button that says so.</p>
+    <h1>Did this file exist before a Bitcoin block?</h1>
+    <p>An OpenTimestamps proof (<code>.ots</code>) says it did. This page recomputes every hash on the way from your file to the block and shows each one, so you can see the claim hold or break. It can also stamp a file to start a new proof.</p>
+    <p class="privacy">Nothing is uploaded. Your file is hashed in this tab, and the page sends nothing until you press a button that says what it will send.</p>
   </section>
 
   <div class="tabs" role="tablist" aria-label="What do you want to do?">
@@ -98,7 +98,7 @@
   <p class="note">These links only open the sites; the page sends nothing. Compare the address on the calendar's page with <a href="https://opentimestamps.org/" target="_blank" rel="noopener noreferrer">opentimestamps.org</a> before sending, and never send more than you can afford to lose.</p>
 </aside>
 <footer>
-  <p>ots-explain <span id="version"></span> · Apache-2.0 · the same five steps are in <code>python/verify_ots.py</code>; both must print identical JSON for every test vector. This is not SPV: it trusts the explorers you ask (two that agree are better than one).</p>
+  <p>ots-explain <span id="version"></span>, Apache-2.0. The same five steps are in <code>python/verify_ots.py</code>, and both must print identical JSON for every test vector. This is not SPV: it trusts the explorers you ask, and two that agree are better than one.</p>
 </footer>
 <script>{{JS}}</script>
 </body>
