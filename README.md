@@ -1,5 +1,9 @@
 # ots-explain
 
+![The page proving a real timestamp: "Proved: this existed before Bitcoin block 975064", then the five steps](docs/hero.png)
+
+*A real stamp from 2026-11-08, checked in the page against two public explorers (`./podman.sh hero` retakes this picture).*
+
 Check, understand and create [OpenTimestamps](https://opentimestamps.org/) proofs in one place: open a `.ots` proof and
 see **every hop** from your file to a Bitcoin block, or stamp a file and upgrade it later, with the file never leaving
 your machine. Two **independent implementations of one written spec** must print byte-identical reports:
