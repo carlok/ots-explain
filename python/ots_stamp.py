@@ -128,6 +128,8 @@ def http_call(timeout=20.0):
     opener = urllib.request.build_opener(_SameHostHttps)
 
     def call(url, data=None):
+        # urllib would also open file: and ftp: URLs; a calendar is always http(s).
+        if urllib.parse.urlparse(url).scheme not in ("http", "https"): raise OSError("not an http(s) URL: %r" % url[:80])
         req = urllib.request.Request(url, data=data, headers={"Accept": "application/vnd.opentimestamps.v1", "User-Agent": "ots-explain/" + V.VERSION})
         try:
             with opener.open(req, timeout=timeout) as r: return r.status, r.read(MAX_CALENDAR_RESPONSE + 1)

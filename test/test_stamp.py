@@ -149,5 +149,15 @@ class UpgradeVectors(unittest.TestCase):
             self.assertEqual((log, status, changed, new.hex()), (c["expect"]["log"], c["expect"]["status"], c["expect"]["changed"], c["expect"]["proof_hex"]), c["title"])
 
 
+
+class HttpCallSchemes(unittest.TestCase):
+    def test_only_http_and_https_are_ever_opened(self):
+        call = S.http_call(1.0)
+        for url in ("file:///etc/hostname", "ftp://example.invalid/x", "gopher://example.invalid/", "data:text/plain,hi", "//example.invalid/x", "example.invalid/x"):
+            with self.assertRaises(OSError, msg=url) as cm:
+                call(url)
+            self.assertIn("not an http(s) URL", str(cm.exception), url)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,5 @@
+# The test folder holds a mock explorer and mock calendar that serve local fixtures on 127.0.0.1, and browser-test
+# assertions on page text. None of it ships (not in dist/, python/ or the runtime image), and CodeQL reads them as
+# "uncontrolled path" and "URL sanitization" findings that do not apply. The shipped code stays scanned.
+paths-ignore:
+  - test

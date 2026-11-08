@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 ## [Unreleased]
 
 ### Fixed
+- CodeQL's first scan of the public repository (3 alerts). `python/ots_stamp.py`: `http_call` handed any URL to `urllib`, which also opens `file:` and `ftp:`; it now refuses every scheme but http(s) (test added). `upgrade` and `watch` were already limited to an allow-list of calendars. The other two alerts were in `test/` (a mock explorer's path check and a browser-test assertion), which does not ship; `.github/codeql/codeql-config.yml` excludes it from the scan.
 - `codeql.yml`: the analysis ran but its report failed with "Resource not accessible by integration" in a private repository; the workflow now has `actions: read`.
 - CI, first run on GitHub: `docker build` looked for a `Dockerfile` (now `-f Containerfile`); the Python 3.9 job needs `ubuntu-24.04` because `ubuntu-latest` is 26.04, which has no 3.9; `test:conformance` and the extra fuzz step ran `unittest test.test_…`, which imports the standard library's own `test` package instead of this folder's (they now use `unittest discover`).
 - Page, "This proof is still pending": the upgrade plan refused every real calendar ("not a calendar this page knows") because it required a 64-digit node, while real calendars hang the pending attestation on a 44-byte node (88 digits). SPEC 12.7 has no length condition and Python never had one. Found by pasting a real, freshly stamped proof. Browser smoke test: 3 new checks on the `two-calendars` vector (75 in all).
