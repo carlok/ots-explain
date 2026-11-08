@@ -261,6 +261,19 @@ try {
   check(pyOn.status === 0 && pyOn.stdout === pj, "the page's JSON for the stamped+upgraded proof equals python's, byte for byte", `exit ${pyOn.status}`);
   await p5.close();
 
+  // 12b. a real calendar hangs its pending attestation on a 44-byte node (88 hex digits), not a 32-byte one: the upgrade
+  // plan must still list the GET (SPEC 12.7 puts no length condition on the node). Nothing is clicked, so nothing is sent.
+  const p5b = await ctx.newPage(); const r5b = requests.length;
+  await p5b.goto(page_url);
+  await p5b.setInputFiles("#file", V("two-calendars", "data.bin"));
+  await p5b.setInputFiles("#proof", V("two-calendars", "proof.ots"));
+  await p5b.waitForSelector("#upgrade");
+  const uplan = (await p5b.textContent("#uplan")).split("\n");
+  check(uplan.length === 2 && uplan.every((l) => /^GET https:\/\/(alice|bob)\.btc\.calendar\.opentimestamps\.org\/timestamp\/[0-9a-f]{88}$/.test(l)), "a real calendar's 44-byte pending node is on the upgrade plan", uplan.join(" | "));
+  check(!(await p5b.$eval("#upgrade", (b) => b.disabled)), "upgrade is enabled for the known calendars of a real proof");
+  check(requests.length === r5b, "listing the plan sends nothing");
+  await p5b.close();
+
   // 13. hostile input: file names, ?proof= and #h= carrying markup or javascript: must stay inert text
   const p6 = await ctx.newPage(); const rh = requests.length;
   const evil = "\"><img src=x onerror=window.__x=1>";
