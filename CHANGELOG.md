@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 ## [Unreleased]
 
 ### Fixed
+- CI, first run on GitHub: `docker build` looked for a `Dockerfile` (now `-f Containerfile`); the Python 3.9 job needs `ubuntu-24.04` because `ubuntu-latest` is 26.04, which has no 3.9; `test:conformance` and the extra fuzz step ran `unittest test.test_…`, which imports the standard library's own `test` package instead of this folder's (they now use `unittest discover`).
 - Page, "This proof is still pending": the upgrade plan refused every real calendar ("not a calendar this page knows") because it required a 64-digit node, while real calendars hang the pending attestation on a 44-byte node (88 digits). SPEC 12.7 has no length condition and Python never had one. Found by pasting a real, freshly stamped proof. Browser smoke test: 3 new checks on the `two-calendars` vector (75 in all).
 - `tools/e2e_real.sh`: the `wild` step runs only when `GH_TOKEN` is set and is reported as skipped otherwise, instead of failing with a 401.
 - `tools/wild_diff.py`: GitHub's code search answers 401 without a token, so `./podman.sh wild` crashed with a traceback. It now reads `GH_TOKEN` (or `GITHUB_TOKEN`), sends it to api.github.com only, does not retry 401/403/404, and says what to set. `podman.sh wild` passes `GH_TOKEN` through. `test/test_wild_diff.py`: 5 tests.
