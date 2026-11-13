@@ -14,9 +14,10 @@ Out of scope: "not SPV" (documented in the README), and the trust you place in t
 
 ## Reporting
 
-Please report privately through GitHub's "Report a vulnerability" (Security tab → Advisories) once the repository
-has it enabled, or by email to the address on the maintainer's GitHub profile. Do not open a public issue for a
-wrong-PASS bug before it is fixed. Expect an acknowledgement within a week; this is a one-person project.
+Please report privately through GitHub's "Report a vulnerability" (Security tab → Advisories), or contact the
+maintainer on GitHub at [@carlok](https://github.com/carlok) for coordination if advisories are not yet enabled. Do
+not open a public issue for a wrong-PASS bug before it is fixed. Expect an acknowledgement within a week; this is a
+one-person project.
 
 ## Supported versions
 
