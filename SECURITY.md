@@ -12,12 +12,17 @@ In scope:
 
 Out of scope: "not SPV" (documented in the README), and the trust you place in the explorers you choose.
 
-## Reporting
+## Reporting vulnerabilities
 
-Please report privately through GitHub's "Report a vulnerability" (Security tab → Advisories), or contact the
-maintainer on GitHub at [@carlok](https://github.com/carlok) for coordination if advisories are not yet enabled. Do
-not open a public issue for a wrong-PASS bug before it is fixed. Expect an acknowledgement within a week; this is a
-one-person project.
+Report security issues **privately**. Do **not** open a public GitHub issue for a vulnerability.
+
+Use GitHub private vulnerability reporting:
+
+1. Open the repository **Security** tab.
+2. Choose **Report a vulnerability**, or go directly to
+   [https://github.com/carlok/ots-explain/security/advisories/new](https://github.com/carlok/ots-explain/security/advisories/new).
+
+Expect an acknowledgement within a week; this is a one-person project.
 
 ## Supported versions
 

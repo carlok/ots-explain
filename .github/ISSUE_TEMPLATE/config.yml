@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: Security problem (wrong PASS, unexpected network request)
     url: https://github.com/carlok/ots-explain/security/advisories/new
-    about: Please report privately.
+    about: Do not use public issues for security reports; see SECURITY.md.

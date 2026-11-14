@@ -5,8 +5,10 @@ This file is for automated coding assistants and humans using agent tooling. The
 
 ## Maintainer contact
 
-Reach the maintainer on GitHub as **[@carlok](https://github.com/carlok)** (issues, discussions, or private security
-advisories). Do not put maintainer email addresses in commits, issues, or public docs.
+Reach the maintainer on GitHub as **[@carlok](https://github.com/carlok)** for issues and discussions. Security
+vulnerabilities: private reporting only — see `SECURITY.md` (no public issues). Code of conduct reports: see
+`CODE_OF_CONDUCT.md`. Do not put maintainer email addresses in commits or issues; the approved contact email appears
+only in `CODE_OF_CONDUCT.md`.
 
 ## Agent rules (non-negotiable)
 
