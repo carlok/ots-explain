@@ -2,6 +2,11 @@
 
 Thanks for looking. The project is small on purpose: one spec, two implementations, one conformance test.
 
+## Security
+
+Do **not** report vulnerabilities in a public issue. Use private vulnerability
+reporting as described in [`SECURITY.md`](SECURITY.md).
+
 ## Ground rules
 
 * **The spec is the contract.** `spec/SPEC.md` decides behaviour. If you change behaviour, change the spec in the

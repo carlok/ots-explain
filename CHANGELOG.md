@@ -8,7 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [Sem
 - `AGENT.md`: setup, test and coverage commands, layout and agent conventions (coverage before commit, no secrets in repo, general public docs).
 
 ### Changed
-- `SECURITY.md` and `CODE_OF_CONDUCT.md`: contact is GitHub [@carlok](https://github.com/carlok) only; no email for security or conduct reports.
+- `SECURITY.md`, `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `CONTRIBUTING.md`, and `README.md`: private security reporting via GitHub advisories; conduct enforcement contact in `CODE_OF_CONDUCT.md`.
 
 ### Fixed
 - CodeQL's first scan of the public repository (3 alerts). `python/ots_stamp.py`: `http_call` handed any URL to `urllib`, which also opens `file:` and `ftp:`; it now refuses every scheme but http(s) (test added). `upgrade` and `watch` were already limited to an allow-list of calendars. The other two alerts were in `test/` (a mock explorer's path check and a browser-test assertion), which does not ship; `.github/codeql/codeql-config.yml` excludes it from the scan.

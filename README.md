@@ -213,8 +213,8 @@ The TypeScript verifier core was written from `spec/` alone, by a separate agent
 Follow `docs/GOING-ONLINE.md` (five checks only a networked machine can do).
 
 See `vectors/PROVENANCE.md`: the 21 imported example proofs come from three LGPL-3.0 OpenTimestamps repositories and stay
-under that licence as unmodified test data (licence text included); everything else is Apache-2.0. Also enable private
-vulnerability reporting (see `SECURITY.md`).
+under that licence as unmodified test data (licence text included); everything else is Apache-2.0.
+Security issues are reported privately (see [`SECURITY.md`](SECURITY.md)); do not open public issues for them.
 
 ## License
 
